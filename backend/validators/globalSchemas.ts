@@ -26,3 +26,8 @@ export const passwordConfirm = Joi.string().required().valid(Joi.ref('password')
     "any.required": "Password confirm is required",
     "any.only": "Password confirm must match"
 })
+
+export const gender = Joi.string().required().valid('Male', 'Female').messages({
+    "any.required": "Gender is required.", 
+    "string.valid": "You have entered a wrong Gender"
+})

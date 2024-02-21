@@ -34,10 +34,18 @@ const userSchema = new mongoose.Schema({
         unique: true
     },
 
+
+    gender: {
+        type: String,
+        required: true,
+        enum: ['Male', 'Female']
+    },
+
+    profileImageUrl: getTypeAndDefaultValue(String, null),
     passwordResetToken: getTypeAndDefaultValue(String, null),
     passwordChangedAt: getTypeAndDefaultValue(Date, null),
     passwordResetExpires: getTypeAndDefaultValue(Date, null)
-})
+}, {timestamps: true})
 
 const User = mongoose.model('User', userSchema)
 

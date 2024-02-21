@@ -45,3 +45,7 @@ export const generateSignupOTP = () => {
 
     return otp
 }
+
+export const isTokenValid = () => {
+    
+}
