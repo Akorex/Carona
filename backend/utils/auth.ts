@@ -1,8 +1,7 @@
 import {randomBytes} from 'node:crypto'
-import {genSaltSync, hashSync} from "bcryptjs"
+import {compareSync, genSaltSync, hashSync} from "bcryptjs"
 import { verify, sign, JwtPayload } from 'jsonwebtoken'
 import {jwt_secret, jwt_lifetime} from "../config/config"
-import { ObjectId } from 'mongoose'
 
 
 interface ISchemaDefault{
@@ -116,4 +115,8 @@ export const createAccessToken = (id: any) => {
     const expiresAt: number = (verify(token, jwt_secret) as JwtPayload).exp || Date.now()
 
     return {token, expiresAt}
+}
+
+export const checkValidity = (value: string, otherValue: string) => {
+    return compareSync(value, otherValue)
 }

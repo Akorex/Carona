@@ -4,7 +4,8 @@ import {
     loginUser,
     forgotPassword,
     deleteAccount,
-    resetPassword
+    resetPassword,
+    changePassword
 } from '../controllers/auth'
 
 import {
@@ -12,6 +13,7 @@ import {
     registerUserValidator
 } from '../validators/auth'
 import joiMiddleware from "../middlewares/joiMiddleware";
+import isLoggedIn from '../middlewares/authentication'
 
 
 const authRouter = Router()
@@ -19,6 +21,7 @@ authRouter.post('/register', joiMiddleware(registerUserValidator), registerUser)
 authRouter.post('/login', joiMiddleware(loginUserValidator), loginUser)
 authRouter.post('/forgot-password', forgotPassword)
 authRouter.post('/delete-account', deleteAccount)
+authRouter.patch('/change-password', isLoggedIn, changePassword)
 
 
 export default authRouter
