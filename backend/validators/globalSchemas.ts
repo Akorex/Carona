@@ -12,9 +12,9 @@ export const lastName = Joi.string().required().min(3).max(20).messages({
     "string.max": "Name must contain at most 20 characters"
 })
 
-export const email = Joi.string().required().email().messages({
-    "any.requird": "Email address is required",
-    "string.email": "Email address is invalid"
+export const email = Joi.string().email().required().messages({
+    "any.required": "Email address is required",
+    "string.email": "Please provide a valid email address"
 })
 
 export const password = Joi.string().required().min(6).messages({

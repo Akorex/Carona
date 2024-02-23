@@ -8,6 +8,17 @@ export const errorResponse = (
     res.status(statusCode).send({status: 'error', error})
 }
 
-export const successResponse = () => {
 
+
+export const successResponse = <T> (
+    res: Response,
+    statusCode: number,
+    message: string,
+    data: T
+): void => {
+    res.status(statusCode).send({
+        status: 'success',
+        'message': message,
+        data
+    })
 }
