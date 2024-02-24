@@ -8,3 +8,4 @@ export const config = {
 
 export const jwt_secret:any = process.env.JWT_SECRET
 export const jwt_lifetime = process.env.JWT_LIFETIME
+export const resetTokenExpiresIn = Number(process.env.RESET_EXPIRY) || 0

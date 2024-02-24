@@ -3,8 +3,9 @@ import logger from "../utils/logger";
 import User from '../models/auth'
 import { errorResponse, successResponse } from "../utils/responses";
 import { StatusCodes } from "http-status-codes";
-import { generateHashedValue, generateSignupOTP, AuthResponseData } from "../utils/auth";
+import { generateHashedValue, generateSignupOTP, AuthResponseData, generateRandomToken } from "../utils/auth";
 import { getBasicUserDetails, createAccessToken, checkValidity } from "../utils/auth";
+import {resetTokenExpiresIn} from "../config/config"
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
     try{
@@ -114,10 +115,30 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 }
 
 export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+    // when user has forgotten their password, forgotPassword serves as utility
+    // to generate and send a token to their email/phone
+
+    try{
+        const {email} = req.body
+
+        // generate the token
+
+        const resetToken = generateRandomToken()
+
+        const user = await User.findOneAndUpdate({email}, {
+            passwordResetToken: resetToken,
+            passwordResetExpires: new Date(Date.now() + resetTokenExpiresIn * 1000).toISOString() //10mins
+        })
+
+    }catch(error){
+        logger.error(`Could not forgotPassword`)
+        next(error)
+    }
 
 }
 
 export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+    // utility for reset password when user 
 
 }
 

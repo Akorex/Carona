@@ -58,7 +58,7 @@ export interface AuthResponseData {
 
 
 
-export const generateRandomTokens = () => {
+export const generateRandomToken = () => {
     const random = randomBytes(32)
 
     return random.toString('hex')
