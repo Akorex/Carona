@@ -36,7 +36,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 
         const otp = generateSignupOTP()
 
-        To do: send the generated OTP to the user's phone no, for verification before 
+        To do: send the generated OTP to the user's phone no & email for verification before 
         successful registeration continues.   
         */
 
@@ -155,7 +155,7 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
             newPassword
         } = req.body
 
-        let user_id = req.user?.userId
+        let user_id = req.user.userId
         const loggedinUser = await User.findById({_id: user_id})
 
         if (! loggedinUser){
