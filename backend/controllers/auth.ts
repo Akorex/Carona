@@ -7,6 +7,7 @@ import { generateHashedValue, generateSignupOTP, AuthResponseData, generateRando
 import { getBasicUserDetails, createAccessToken, checkValidity } from "../utils/auth";
 import {resetTokenExpiresIn} from "../config/config"
 import { sendEmail } from "../utils/mailer";
+import {config} from '../config/config'
 
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -178,8 +179,6 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
 }
 
 export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
-    // when user has forgotten their password, forgotPassword serves as utility
-    // to generate and send a token to their email/phone
 
     try{
         logger.info(`START: Forgot Password Service`)
@@ -188,38 +187,105 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
         // generate the token
 
         const resetToken = generateRandomToken()
+        const passwordResetUrl = `http:localhost:${config.port}/api/v1/auth/reset-password?token=${resetToken}`
 
         const user = await User.findOneAndUpdate({email}, {
             passwordResetToken: resetToken,
             passwordResetExpires: new Date(Date.now() + resetTokenExpiresIn * 1000).toISOString() //10mins
         })
 
+        if (!user) {
+            logger.info(`END: Forgot Password Service`)
+            return errorResponse(
+                res,
+                StatusCodes.NOT_FOUND,
+                `This account does not exist. Could not reset password`
+            )
+        }
+
         // send email with the token
         const emailOptions = {
-            from: "akoredeadewole8@gmail.com", // can be changed,
+            from: "akoredeadewole8@gmail.com", // will be changed to Carona's,
             to: email,
             subject: "Reset your password",
-            body: `<p> Hello </p>
+            body: `<p> Hello, </p>
                     
-                    <p> To sign in to your account, we've reset your password.
+                    <p> To sign in to your account, we have reset your password.
                     You need to create a new password to log back in.
-                    Click <a href = ""> here </a> to reset your password.
+                    Click <a href = "${passwordResetUrl}"> here </a> to reset your password.
+
+                    Please note that this is only available for ten (10) minutes.
                     </p>`
         }
 
         await sendEmail(emailOptions)
 
+        successResponse(
+            res,
+            StatusCodes.OK,
+            `Email has been reset successfully.`,
+            null
+        )
+
         logger.info(`END: Forgot Password Service`)
 
     }catch(error){
-        logger.error(`Could not forgotPassword`)
+        logger.error(`Could not forgot Password`)
         next(error)
     }
 
 }
 
 export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
-    // utility for reset password when user 
+    // utility for reset password when user forgets their password
+    try{
+        logger.info(`START: Password Reset Service`)
+        const {newPassword} = req.body
+        const resetToken = req.query.token
+
+        // search for the user
+        const user = await User.findOne({passwordResetToken: resetToken})
+        const storedResetToken = user?.passwordResetToken
+        const storedTokenExpiry: any = user?.passwordResetExpires
+
+
+        if (!user) {
+            logger.info(`END: Password Reset Service`)
+            return errorResponse(
+                res,
+                StatusCodes.BAD_REQUEST,
+                `There is an error with the token. Please try again`
+            )
+
+        }
+
+        if (storedResetToken === resetToken && storedTokenExpiry > Date.now()){
+            
+            // update the password
+            const updatePassword = await User.findOneAndUpdate(
+                {passwordResetToken: resetToken},
+                {password: generateHashedValue(newPassword)}, 
+            )
+
+            successResponse(res,
+                StatusCodes.OK,
+                `Password has been reset successfully. Log in with the new password`,
+                null)
+
+            logger.info(`END: Password Reset Service`)
+        }else{
+            logger.info(`END: Password Reset Service`)
+            errorResponse(res,
+                StatusCodes.BAD_REQUEST,
+                `The password token has expired. Please try again.`
+                )
+        }
+
+
+    }catch(error){
+        logger.error(`Could not reset password.`)
+        next(error)
+    }
 
 }
 
