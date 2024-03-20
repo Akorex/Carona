@@ -10,7 +10,7 @@ export interface EmailOptions {
 }
 
 const transporter = nodemailer.createTransport({
-    host: "smtp@gmail.com",
+    host: "smtp.gmail.com",
     port: 465,
     secure: true,
     auth: {
@@ -32,8 +32,9 @@ export async function sendEmail({
 }: EmailOptions){
     try{
         logger.info(`Sending Email from ${from} to ${to}`)
+        console.log(`works 1`)
 
-        await transporter.verify()
+        //await transporter.verify()
         await transporter.sendMail({
             from: `Carona <${from}>`,
             to,

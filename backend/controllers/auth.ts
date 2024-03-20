@@ -6,6 +6,8 @@ import { StatusCodes } from "http-status-codes";
 import { generateHashedValue, generateSignupOTP, AuthResponseData, generateRandomToken } from "../utils/auth";
 import { getBasicUserDetails, createAccessToken, checkValidity } from "../utils/auth";
 import {resetTokenExpiresIn} from "../config/config"
+import { sendEmail } from "../utils/mailer";
+
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
     try{
@@ -180,6 +182,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
     // to generate and send a token to their email/phone
 
     try{
+        logger.info(`START: Forgot Password Service`)
         const {email} = req.body
 
         // generate the token
@@ -190,6 +193,23 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
             passwordResetToken: resetToken,
             passwordResetExpires: new Date(Date.now() + resetTokenExpiresIn * 1000).toISOString() //10mins
         })
+
+        // send email with the token
+        const emailOptions = {
+            from: "akoredeadewole8@gmail.com", // can be changed,
+            to: email,
+            subject: "Reset your password",
+            body: `<p> Hello </p>
+                    
+                    <p> To sign in to your account, we've reset your password.
+                    You need to create a new password to log back in.
+                    Click <a href = ""> here </a> to reset your password.
+                    </p>`
+        }
+
+        await sendEmail(emailOptions)
+
+        logger.info(`END: Forgot Password Service`)
 
     }catch(error){
         logger.error(`Could not forgotPassword`)
