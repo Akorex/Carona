@@ -42,6 +42,8 @@ const userSchema = new mongoose.Schema({
     },
 
     profileImageUrl: getTypeAndDefaultValue(String, null),
+    accountCreateToken: getTypeAndDefaultValue(String, null),
+    accountCreateTokenExpires: getTypeAndDefaultValue(Date, null),
     passwordResetToken: getTypeAndDefaultValue(String, null),
     passwordChangedAt: getTypeAndDefaultValue(Date, null),
     passwordResetExpires: getTypeAndDefaultValue(Date, null)

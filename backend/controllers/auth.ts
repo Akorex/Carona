@@ -38,6 +38,9 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 
         To do: send the generated OTP to the user's phone no & email for verification before 
         successful registeration continues.   
+
+        User is shown a separate form to input the OTP. The OTP sent to the user is verified with the database
+        and then if correct, user can log in
         */
 
         const newUser = await User.create({
@@ -114,37 +117,6 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 
 }
 
-export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
-    // when user has forgotten their password, forgotPassword serves as utility
-    // to generate and send a token to their email/phone
-
-    try{
-        const {email} = req.body
-
-        // generate the token
-
-        const resetToken = generateRandomToken()
-
-        const user = await User.findOneAndUpdate({email}, {
-            passwordResetToken: resetToken,
-            passwordResetExpires: new Date(Date.now() + resetTokenExpiresIn * 1000).toISOString() //10mins
-        })
-
-    }catch(error){
-        logger.error(`Could not forgotPassword`)
-        next(error)
-    }
-
-}
-
-export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
-    // utility for reset password when user 
-
-}
-
-export const deleteAccount = async (req: Request, res: Response, next: NextFunction) => {
-
-}
 
 export const changePassword = async (req: Request, res: Response, next: NextFunction) => {
     try{
@@ -201,4 +173,38 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
         next(error)
     }
     
+}
+
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+    // when user has forgotten their password, forgotPassword serves as utility
+    // to generate and send a token to their email/phone
+
+    try{
+        const {email} = req.body
+
+        // generate the token
+
+        const resetToken = generateRandomToken()
+
+        const user = await User.findOneAndUpdate({email}, {
+            passwordResetToken: resetToken,
+            passwordResetExpires: new Date(Date.now() + resetTokenExpiresIn * 1000).toISOString() //10mins
+        })
+
+    }catch(error){
+        logger.error(`Could not forgotPassword`)
+        next(error)
+    }
+
+}
+
+export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+    // utility for reset password when user 
+
+}
+
+
+
+export const deleteAccount = async (req: Request, res: Response, next: NextFunction) => {
+
 }
