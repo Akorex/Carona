@@ -190,7 +190,22 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
             )        
         }
 
-        // To do - send mail to user upon successful change of password
+        const email = changedPassword.email
+
+        const emailOptions = {
+            from: "akoredeadewole8@gmail.com", // to change to Carona's
+            to: email,
+            subject: "Password changed",
+            body: `<h2> Your password has been changed </h2>
+            
+                    <p> Your password has been changed, as you asked. </p>
+                    
+                    <p> If you didn't ask to change your password, we're here to help keep
+                    your account secure. Visit our <a href=""> support page </a> for more info.
+                    </p>`
+        }
+
+        await sendEmail(emailOptions)
 
         successResponse(
             res,
@@ -213,10 +228,8 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
         logger.info(`START: Forgot Password Service`)
         const {email} = req.body
 
-        // generate the token
-
         const resetToken = generateRandomToken()
-        const passwordResetUrl = `http:localhost:${config.port}/api/v1/auth/reset-password?token=${resetToken}`
+        const passwordResetUrl = `http://localhost:${config.port}/api/v1/auth/reset-password?token=${resetToken}`
 
         const user = await User.findOneAndUpdate({email}, {
             passwordResetToken: resetToken,
@@ -232,7 +245,6 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
             )
         }
 
-        // send email with the token
         const emailOptions = {
             from: "akoredeadewole8@gmail.com", // will be changed to Carona's,
             to: email,
@@ -252,7 +264,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
         successResponse(
             res,
             StatusCodes.OK,
-            `Email has been reset successfully.`,
+            `Please check your email to reset your password.`,
             null
         )
 
