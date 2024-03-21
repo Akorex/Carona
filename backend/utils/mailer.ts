@@ -32,11 +32,9 @@ export async function sendEmail({
 }: EmailOptions){
     try{
         logger.info(`Sending Email from ${from} to ${to}`)
-        console.log(`works 1`)
-
-        //await transporter.verify()
+        
         await transporter.sendMail({
-            from: `Carona <${from}>`,
+            from: `Akorede from Carona <${from}>`,
             to,
             subject: `${subject} - Carona`,
             html: body

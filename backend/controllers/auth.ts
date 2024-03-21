@@ -61,6 +61,33 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             `Successfully created account`,
             {user: getBasicUserDetails(newUser), jwt: createAccessToken(newUser._id)}
         )
+
+        const emailOptions = {
+            from: "akoredeadewole8@gmail.com", // will be changed to Carona's
+            to: email,
+            subject: "Welcome to Carona!", 
+            body: `<h3> Hello ${firstName}, </h3>
+            
+                    <p> You're officially part of the solution to smoother commutes in
+                    Lagos! We're so excited to have you join our carpooling community. Think of us
+                    as as your weapon against a chaotic daily commute. We know
+                    you'd like a peaceful commute experience while you look forward to the day ahead. </p>
+                    
+                   <p> With Carona, you get to share the ride with people going your way, enjoy a more 
+                   comfortable commute, and maybe even make a few new friends along the way. Plus,
+                   you're doing your part to take cars off the road, making Lagos a less chaotic city. 
+                   We think that's pretty cool. </p>
+
+                   <p> Let me know if you have any questions.
+                    We're always here to make your ride (and your day) a whole lot better. </p>
+
+                    <p> Cheers, </p>
+                    <p> Akorede from Carona. </p>
+                    `
+        }
+
+        await sendEmail(emailOptions)
+
         logger.info(`END: Create User Service`)
     
     }catch(error){
@@ -163,6 +190,8 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
             )        
         }
 
+        // To do - send mail to user upon successful change of password
+
         successResponse(
             res,
             StatusCodes.OK,
@@ -210,8 +239,8 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
             subject: "Reset your password",
             body: `<p> Hello, </p>
                     
-                    <p> To sign in to your account, we have reset your password.
-                    You need to create a new password to log back in.
+                    <p> We have reset your password. To sign in to your account, you need to
+                    create a new password. 
                     Click <a href = "${passwordResetUrl}"> here </a> to reset your password.
 
                     Please note that this is only available for ten (10) minutes.
