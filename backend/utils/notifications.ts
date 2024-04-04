@@ -1,12 +1,15 @@
 import mongoose from "mongoose"
+import { Timestamps } from "./auth"
 
-interface IBasicNotification{
+interface IBasicNotification extends Timestamps{
     _id: any,
     title: string,
     message: string,
-    user: mongoose.Types.ObjectId,
+    user: any,
     isReadFlag: boolean
 }
+
+
 
 export const getBasicNotification = (notification: IBasicNotification) => {
     const {

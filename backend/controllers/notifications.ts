@@ -38,8 +38,9 @@ export const getNotification = async (req: Request, res: Response, next: NextFun
         logger.info(`END: Get Notification Service`)
         successResponse(res,
             StatusCodes.ACCEPTED,
-            getBasicNotification(notification),
-            null)
+            `Successfully returned notification`,
+            {notification: getBasicNotification(notification)},
+            )
 
     }catch(error){
         logger.error(`Could not get Notification`)

@@ -15,7 +15,7 @@ interface ISchemaDefault{
     default: null | string | number | Date | boolean
 }
 
-interface Timestamps {
+export interface Timestamps {
     createdAt: Date,
     updatedAt: Date
 }
