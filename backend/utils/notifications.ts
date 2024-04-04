@@ -1,7 +1,13 @@
 import mongoose from "mongoose"
-import { Timestamps } from "./auth"
 
-interface IBasicNotification extends Timestamps{
+
+
+interface NotificationTimestamp{
+    createdAt: Date,
+    updatedAt: Date
+}
+
+interface IBasicNotification extends NotificationTimestamp{
     _id: any,
     title: string,
     message: string,

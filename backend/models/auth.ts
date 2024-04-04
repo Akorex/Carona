@@ -41,10 +41,10 @@ const userSchema = new mongoose.Schema({
         enum: ['Male', 'Female']
     },
 
-    notifications: [{
+    /*notifications: [{
         type: mongoose.Types.ObjectId,
         ref: 'Notifications'
-    }],
+    }],*/
 
     profileImageUrl: getTypeAndDefaultValue(String, null),
     accountCreateToken: getTypeAndDefaultValue(String, null),

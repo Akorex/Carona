@@ -13,6 +13,28 @@ export const getAllNotifications = async (req: Request, res: Response, next: Nex
 
         const notifications = await Notifications.find({user: user_id})
 
+        if (!notifications){
+            logger.info(`END: Get All Notifications Service`)
+            errorResponse(res,
+                StatusCodes.NOT_FOUND,
+                `No notification found`)
+        }
+
+        if (notifications && notifications.length > 0){
+            const formattedNotifications = notifications.map((notification) =>({
+                title: notification.title,
+                message: notification.message
+            }))
+            
+            logger.info(`END: Get All Notifications Service`)
+            successResponse(
+                res,
+                StatusCodes.OK,
+                `Successfully fetched notifications`,
+                formattedNotifications
+            )
+        }
+
     }catch(error){
         logger.error(`Could not get Notifications`)
         next(error)

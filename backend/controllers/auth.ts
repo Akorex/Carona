@@ -3,7 +3,7 @@ import logger from "../utils/logger";
 import User from '../models/auth'
 import { errorResponse, successResponse } from "../utils/responses";
 import { StatusCodes } from "http-status-codes";
-import { generateHashedValue, generateSignupOTP, AuthResponseData, generateRandomToken } from "../utils/auth";
+import { generateHashedValue, generateSignupOTP, AuthResponseData, generateRandomToken, IBasicUser } from "../utils/auth";
 import { getBasicUserDetails, createAccessToken, checkValidity } from "../utils/auth";
 import {resetTokenExpiresIn} from "../config/config"
 import { sendEmail } from "../utils/mailer";

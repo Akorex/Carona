@@ -2,7 +2,7 @@ import {randomBytes} from 'node:crypto'
 import {compareSync, genSaltSync, hashSync} from "bcryptjs"
 import { verify, sign, JwtPayload } from 'jsonwebtoken'
 import {jwt_secret, jwt_lifetime} from "../config/config"
-
+import mongoose from 'mongoose'
 
 interface ISchemaDefault{
     type:
