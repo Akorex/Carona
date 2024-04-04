@@ -1,6 +1,3 @@
-import mongoose from "mongoose"
-
-
 
 interface NotificationTimestamp{
     createdAt: Date,
