@@ -41,6 +41,11 @@ const userSchema = new mongoose.Schema({
         enum: ['Male', 'Female']
     },
 
+    notifications: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'Notifications'
+    }],
+
     profileImageUrl: getTypeAndDefaultValue(String, null),
     accountCreateToken: getTypeAndDefaultValue(String, null),
     accountCreateTokenExpires: getTypeAndDefaultValue(Date, null),
