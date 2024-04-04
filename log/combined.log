@@ -1,8 +1,0 @@
-[31m[1m2024-04-04 14:37:04 error: Error[22m[39m
-[31m[1m2024-04-04 14:37:34 error: Error[22m[39m
-[31m[1m2024-04-04 14:38:52 error: Error[22m[39m
-[31m[1m2024-04-04 14:43:47 error: Unable to connect to the database: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.[22m[39m
-[31m[1m2024-04-04 14:43:57 error: Error[22m[39m
-[31m[1m2024-04-04 14:45:06 error: Unable to connect to the database: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.[22m[39m
-[31m[1m2024-04-04 14:45:16 error: Error[22m[39m
-[36m[1m2024-04-04 14:46:03 info: Connected to the database successfully.[22m[39m
