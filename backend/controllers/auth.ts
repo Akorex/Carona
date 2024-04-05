@@ -9,7 +9,7 @@ import { getBasicUserDetails, createAccessToken, checkValidity } from "../utils/
 import {resetTokenExpiresIn} from "../config/config"
 import { sendEmail } from "../utils/mailer";
 import {config} from '../config/config'
-import { welcomeNotificationService } from "../services/auth";
+import { changePasswordEmailService, passwordTokenEmailService, welcomeEmailService, welcomeNotificationService } from "../services/auth";
 
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -64,35 +64,10 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             {user: getBasicUserDetails(newUser), jwt: createAccessToken(newUser._id)}
         )
 
-        // send welcome email to the user
-
-        const emailOptions = {
-            from: "akoredeadewole8@gmail.com", // will be changed to Carona's
-            to: email,
-            subject: "Welcome to Carona!", 
-            body: `<h3> Hello ${firstName}, </h3>
-            
-                    <p> You're officially part of the solution to smoother commutes in
-                    Lagos! We're so excited to have you join our carpooling community. Think of us
-                    as as your weapon against a chaotic daily commute. We know
-                    you'd like a peaceful commute experience while you look forward to the day ahead. </p>
-                    
-                   <p> With Carona, you get to share the ride with people going your way, enjoy a more 
-                   comfortable commute, and maybe even make a few new friends along the way. Plus,
-                   you're doing your part to take cars off the road, making Lagos a less chaotic city. 
-                   We think that's pretty cool. </p>
-
-                   <p> Let me know if you have any questions.
-                    We're always here to make your ride (and your day) a whole lot better. </p>
-
-                    <p> Cheers, </p>
-                    <p> Akorede from Carona. </p>
-                    `
-        }
 
         // on successful account creation, users get an email and a notification
         await welcomeNotificationService(firstName, newUser._id)
-        await sendEmail(emailOptions)
+        await welcomeEmailService(firstName, email)
 
         logger.info(`END: Create User Service`)
     
@@ -198,20 +173,7 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
 
         const email = changedPassword.email
 
-        const emailOptions = {
-            from: "akoredeadewole8@gmail.com", // to change to Carona's
-            to: email,
-            subject: "Password changed",
-            body: `<h2> Your password has been changed </h2>
-            
-                    <p> Your password has been changed, as you asked. </p>
-                    
-                    <p> If you didn't ask to change your password, we're here to help keep
-                    your account secure. Visit our <a href=""> support page </a> for more info.
-                    </p>`
-        }
-
-        await sendEmail(emailOptions)
+       await changePasswordEmailService(email)
 
         successResponse(
             res,
@@ -251,21 +213,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
             )
         }
 
-        const emailOptions = {
-            from: "akoredeadewole8@gmail.com", // will be changed to Carona's,
-            to: email,
-            subject: "Reset your password",
-            body: `<p> Hello, </p>
-                    
-                    <p> We have reset your password. To sign in to your account, you need to
-                    create a new password. 
-                    Click <a href = "${passwordResetUrl}"> here </a> to reset your password.
-
-                    Please note that this is only available for ten (10) minutes.
-                    </p>`
-        }
-
-        await sendEmail(emailOptions)
+        await passwordTokenEmailService(passwordResetUrl, email)
 
         successResponse(
             res,
