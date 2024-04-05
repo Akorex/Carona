@@ -6,8 +6,6 @@ import 'dotenv/config'
 
 const mongoUri = config.uri
 
-console.log(mongoUri)
-
 const seedNotification = async () => {
 
     try{

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import logger from "../utils/logger";
 import User from '../models/auth'
+import Notifications from "../models/notifications";
 import { errorResponse, successResponse } from "../utils/responses";
 import { StatusCodes } from "http-status-codes";
 import { generateHashedValue, generateSignupOTP, AuthResponseData, generateRandomToken, IBasicUser } from "../utils/auth";
@@ -8,6 +9,7 @@ import { getBasicUserDetails, createAccessToken, checkValidity } from "../utils/
 import {resetTokenExpiresIn} from "../config/config"
 import { sendEmail } from "../utils/mailer";
 import {config} from '../config/config'
+import { welcomeNotificationService } from "../services/auth";
 
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -62,6 +64,8 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             {user: getBasicUserDetails(newUser), jwt: createAccessToken(newUser._id)}
         )
 
+        // send welcome email to the user
+
         const emailOptions = {
             from: "akoredeadewole8@gmail.com", // will be changed to Carona's
             to: email,
@@ -86,6 +90,8 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
                     `
         }
 
+        // on successful account creation, users get an email and a notification
+        await welcomeNotificationService(firstName, newUser._id)
         await sendEmail(emailOptions)
 
         logger.info(`END: Create User Service`)
