@@ -1,6 +1,6 @@
 import Notifications from "../models/notifications"
 import { sendEmail } from "../utils/mailer"
-
+import User from "../models/auth"
 
 export const welcomeNotificationService = async (firstName: string, userId: any) => {
     const title = `Welcome ${firstName}`
@@ -80,6 +80,27 @@ export const passwordTokenEmailService = async (passwordResetUrl: string, email:
 
                 Please note that this is only available for ten (10) minutes.
                 </p>`
+    }
+
+    await sendEmail(emailOptions)
+}
+
+export const verifyEmailService = async (verifyEmailToken: string,email: string) =>{
+    const emailOptions = {
+        from: "akoredeadewole8@gmail.com", // will be changed to Carona's
+        to: email,
+        subject: "Carona Email Verification",
+        body: `<p> Thank you for creating an account with Carona. You're required to 
+                    verify your email address with the following token: </p>
+                    
+                    <h3> ${verifyEmailToken} </h3>
+
+                    <p> If you have any questions, please send an email to Support and 
+                    we will be happy to assist you. </p>
+
+                    <p> Best Regards, </p>
+                    <p> Akorede from Carona. </p>
+                    `
     }
 
     await sendEmail(emailOptions)

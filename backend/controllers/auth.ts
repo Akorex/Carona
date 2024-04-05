@@ -36,17 +36,6 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             )
         }
 
-        
-        /*....
-
-        const otp = generateSignupOTP()
-
-        To do: send the generated OTP to the user's phone no & email for verification before 
-        successful registeration continues.   
-
-        User is shown a separate form to input the OTP. The OTP sent to the user is verified with the database
-        and then if correct, user can log in
-        */
 
         const newUser = await User.create({
             firstName,
@@ -79,6 +68,17 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 
 
 }
+
+/* 
+export const verifyUser = async (req: Request, res: Response, next: NextFunction, email: string) => {
+
+    const user = await User.findOne({email})
+
+    if (user){
+        const verificationToken = user.verificationToken
+    }
+} */
+
 
 export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
     try{

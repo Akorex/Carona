@@ -41,6 +41,15 @@ const userSchema = new mongoose.Schema({
         enum: ['Male', 'Female']
     },
 
+    isVerified:{
+        type: Boolean,
+        default: false
+    },
+
+    verificationToken: {
+        type: Number
+    },
+
     /*notifications: [{
         type: mongoose.Types.ObjectId,
         ref: 'Notifications'
