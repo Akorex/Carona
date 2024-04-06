@@ -1,15 +1,18 @@
 import { Request, Response, NextFunction } from "express";
 import logger from "../utils/logger";
 import User from '../models/auth'
-import Notifications from "../models/notifications";
+import { generateOTP } from "../utils/auth";
 import { errorResponse, successResponse } from "../utils/responses";
 import { StatusCodes } from "http-status-codes";
-import { generateHashedValue, generateSignupOTP, AuthResponseData, generateRandomToken, IBasicUser } from "../utils/auth";
+import { generateHashedValue, AuthResponseData, generateRandomToken, IBasicUser } from "../utils/auth";
 import { getBasicUserDetails, createAccessToken, checkValidity } from "../utils/auth";
 import {resetTokenExpiresIn} from "../config/config"
-import { sendEmail } from "../utils/mailer";
 import {config} from '../config/config'
-import { changePasswordEmailService, passwordTokenEmailService, welcomeEmailService, welcomeNotificationService } from "../services/auth";
+import { changePasswordEmailService, 
+    passwordTokenEmailService, 
+    welcomeEmailService, 
+    welcomeNotificationService,
+    verifyEmailService } from "../services/auth";
 
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -36,6 +39,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             )
         }
 
+        const otp = generateOTP()
 
         const newUser = await User.create({
             firstName,
@@ -43,21 +47,23 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             email,
             password: generateHashedValue(password),
             gender,
-            phoneNumber
+            phoneNumber,
+            verificationToken: otp
         })
 
-        successResponse<AuthResponseData>(
+       /*  successResponse<AuthResponseData>(
             res,
             StatusCodes.CREATED,
             `Successfully created account`,
             {user: getBasicUserDetails(newUser), jwt: createAccessToken(newUser._id)}
         )
-
+ */
 
         // on successful account creation, users get an email and a notification
-        await welcomeNotificationService(firstName, newUser._id)
-        await welcomeEmailService(firstName, email)
+        
+        await verifyEmailService(otp, email)
 
+        res.redirect(`verifyUser?email=${encodeURIComponent(email)}`)
         logger.info(`END: Create User Service`)
     
     }catch(error){
@@ -65,19 +71,67 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
         next(error)
     }
 
-
-
 }
 
-/* 
-export const verifyUser = async (req: Request, res: Response, next: NextFunction, email: string) => {
 
-    const user = await User.findOne({email})
+export const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
 
-    if (user){
-        const verificationToken = user.verificationToken
+    try{
+        logger.info(`START: Verify Account Service`)
+
+        const {token} = req.body
+        const encodedEmail = req.query.email
+
+        if (typeof encodedEmail === 'string'){
+            const email = decodeURIComponent(encodedEmail)
+            
+            const user = await User.findOne({email})
+            
+            if(!user) {
+                logger.info(`END: Verify Account Service`)
+                return errorResponse(res,
+                    StatusCodes.NOT_FOUND,
+                    `Could not find user`)
+                }
+
+            const storedToken = user.verificationToken
+
+            console.log(storedToken)
+            console.log(token)
+
+            if (storedToken !== token){
+                logger.info(`END: Verify Account Service`)
+                return errorResponse(res,
+                    StatusCodes.BAD_REQUEST,
+                    `You have entered the wrong pin`)
+                }
+
+            if (storedToken === token){
+                const user = await User.findOneAndUpdate({email}, {isVerified: true}, {new: true, runValidators: true})
+                
+                if (!user){
+                    return errorResponse(
+                        res,
+                        StatusCodes.BAD_REQUEST,
+                        `Something went wrong`
+                        )
+                    }
+                    await welcomeNotificationService(user.firstName, user._id)
+                    await welcomeEmailService(user.firstName, user.email)
+                    
+                    logger.info(`END: Verify Account Service`)
+                    
+                    return successResponse(res,
+                        StatusCodes.OK,
+                        `Account verified successfully`,
+                        null)
+                    }
+        }
+    }catch(error){
+        logger.error(`Could not verify account.`)
+        next(error)
     }
-} */
+}
 
 
 export const loginUser = async (req: Request, res: Response, next: NextFunction) => {

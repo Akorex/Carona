@@ -2,7 +2,8 @@ import {randomBytes} from 'node:crypto'
 import {compareSync, genSaltSync, hashSync} from "bcryptjs"
 import { verify, sign, JwtPayload } from 'jsonwebtoken'
 import {jwt_secret, jwt_lifetime} from "../config/config"
-import mongoose from 'mongoose'
+import otpGenerator from 'otp-generator'
+
 
 interface ISchemaDefault{
     type:
@@ -64,15 +65,9 @@ export const generateRandomToken = () => {
     return random.toString('hex')
 }
 
-export const generateSignupOTP = () => {
-    const digits = '0123456789'
-    let otp = ''
-
-    for (let i = 0; i < 6; i++){
-        otp += digits[Math.floor(Math.random() * digits.length)]
-    }
-
-    return otp
+export const generateOTP = () => {
+    return otpGenerator.generate(6, { digits: true, lowerCaseAlphabets: false, upperCaseAlphabets: false, 
+        specialChars: false });
 }
 
 export const isTokenValid = (token: string) => {

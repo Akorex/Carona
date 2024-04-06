@@ -1,6 +1,7 @@
 import Notifications from "../models/notifications"
 import { sendEmail } from "../utils/mailer"
-import User from "../models/auth"
+
+
 
 export const welcomeNotificationService = async (firstName: string, userId: any) => {
     const title = `Welcome ${firstName}`
@@ -105,3 +106,5 @@ export const verifyEmailService = async (verifyEmailToken: string,email: string)
 
     await sendEmail(emailOptions)
 }
+
+

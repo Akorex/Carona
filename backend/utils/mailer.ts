@@ -36,7 +36,7 @@ export async function sendEmail({
         await transporter.sendMail({
             from: `Akorede from Carona <${from}>`,
             to,
-            subject: `${subject} - Carona`,
+            subject: `${subject}`,
             html: body
         })
 
