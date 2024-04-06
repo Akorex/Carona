@@ -51,15 +51,6 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             verificationToken: otp
         })
 
-       /*  successResponse<AuthResponseData>(
-            res,
-            StatusCodes.CREATED,
-            `Successfully created account`,
-            {user: getBasicUserDetails(newUser), jwt: createAccessToken(newUser._id)}
-        )
- */
-
-        // on successful account creation, users get an email and a notification
         
         await verifyEmailService(otp, email)
 
@@ -74,8 +65,17 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 }
 
 
-export const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
+export const loadVerifyUser = async (req: Request, res: Response, next: NextFunction) => {
+    return successResponse(
+        res,
+        StatusCodes.OK,
+        `Message passed successfully`,
+        null
+    )
+}
 
+
+export const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
     try{
         logger.info(`START: Verify Account Service`)
 
@@ -96,9 +96,6 @@ export const verifyUser = async (req: Request, res: Response, next: NextFunction
 
             const storedToken = user.verificationToken
 
-            console.log(storedToken)
-            console.log(token)
-
             if (storedToken !== token){
                 logger.info(`END: Verify Account Service`)
                 return errorResponse(res,
@@ -107,7 +104,9 @@ export const verifyUser = async (req: Request, res: Response, next: NextFunction
                 }
 
             if (storedToken === token){
-                const user = await User.findOneAndUpdate({email}, {isVerified: true}, {new: true, runValidators: true})
+                const user = await User.findOneAndUpdate({email}, 
+                    {isVerified: true},
+                     {new: true, runValidators: true})
                 
                 if (!user){
                     return errorResponse(
@@ -119,13 +118,14 @@ export const verifyUser = async (req: Request, res: Response, next: NextFunction
                     await welcomeNotificationService(user.firstName, user._id)
                     await welcomeEmailService(user.firstName, user.email)
                     
-                    logger.info(`END: Verify Account Service`)
-                    
-                    return successResponse(res,
-                        StatusCodes.OK,
-                        `Account verified successfully`,
-                        null)
-                    }
+                    logger.info(`END: Verify Account Service`)   
+                    successResponse<AuthResponseData>(
+                        res,
+                        StatusCodes.CREATED,
+                        `Successfully created account`,
+                        {user: getBasicUserDetails(user), jwt: createAccessToken(user._id)}
+                    )
+            }
         }
     }catch(error){
         logger.error(`Could not verify account.`)

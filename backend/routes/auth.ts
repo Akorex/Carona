@@ -6,7 +6,8 @@ import {
     deleteAccount,
     resetPassword,
     changePassword,
-    verifyUser
+    verifyUser,
+    loadVerifyUser
 } from '../controllers/auth'
 
 import {
@@ -19,8 +20,8 @@ import isLoggedIn from '../middlewares/authentication'
 
 const authRouter = Router()
 authRouter.post('/register', joiMiddleware(registerUserValidator), registerUser)
-//authRouter.get('/verifyUser')
-authRouter.get('/verifyUser', verifyUser)
+authRouter.post('/verifyUser', verifyUser)
+authRouter.get('/verifyUser', loadVerifyUser)
 authRouter.post('/login', joiMiddleware(loginUserValidator), loginUser)
 authRouter.post('/forgot-password', forgotPassword)
 authRouter.post('reset-password', resetPassword)
