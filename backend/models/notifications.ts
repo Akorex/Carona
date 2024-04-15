@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const NotificationSchema = new mongoose.Schema({
     title: {
@@ -11,8 +11,8 @@ const NotificationSchema = new mongoose.Schema({
         required: true
     },
 
-    user: {
-        type: mongoose.Types.ObjectId,
+    userId: {
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },

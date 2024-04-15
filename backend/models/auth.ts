@@ -50,11 +50,6 @@ const userSchema = new mongoose.Schema({
         type: Number
     },
 
-    /*notifications: [{
-        type: mongoose.Types.ObjectId,
-        ref: 'Notifications'
-    }],*/
-
     profileImageUrl: getTypeAndDefaultValue(String, null),
     accountCreateToken: getTypeAndDefaultValue(String, null),
     accountCreateTokenExpires: getTypeAndDefaultValue(Date, null),
