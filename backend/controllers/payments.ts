@@ -4,14 +4,16 @@ import logger from '../utils/logger'
 import User from "../models/auth";
 import { errorResponse } from "../utils/responses";
 import { StatusCodes } from "http-status-codes";
-import { generateTransactionId } from "../utils/payments";
+import { generateTransactionId,
+    fetchUserDetails
+ } from "../utils/payments";
 import got from 'got'
 import { FLW_SECRET_KEY } from "../config/config";
 
 export const payTicket = async (req: Request, res: Response, next: NextFunction) => {
     try{
         logger.info(`START: Pay Ticket Service`)
-        let userId = req.user.id
+        let userId = req.user.userId
 
         const user = await User.findById({userId})
 
@@ -66,7 +68,7 @@ export const payTicket = async (req: Request, res: Response, next: NextFunction)
                 }
         }}).json()
 
-
+        res.status(200).send(response)
 
     }catch(error){
         logger.error(`Failed to pay ticket`)
