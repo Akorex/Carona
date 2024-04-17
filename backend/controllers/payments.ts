@@ -7,15 +7,18 @@ import { StatusCodes } from "http-status-codes";
 import { generateTransactionId,
     fetchUserDetails
  } from "../utils/payments";
-import got from 'got'
+import axios from 'axios'
 import { FLW_SECRET_KEY } from "../config/config";
+
+
+
 
 export const payTicket = async (req: Request, res: Response, next: NextFunction) => {
     try{
         logger.info(`START: Pay Ticket Service`)
         let userId = req.user.userId
 
-        const user = await User.findById({userId})
+        const user = await User.findOne({_id: userId})
 
         if (!user){
             logger.info(`END: Pay Ticket Service`)
@@ -52,9 +55,9 @@ export const payTicket = async (req: Request, res: Response, next: NextFunction)
         logger.info(`Transaction created successfully in database. Fetching Flutterwave API`)
 
 
-        const response = await got.post("https://api.flutterwave.com/v3/payments", {
+        const response = await axios.post("https://api.flutterwave.com/v3/payments", {
             headers: {
-                Authorization: `Bearer ${FLW_SECRET_KEY}`
+                Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`
             },
 
             json: {
@@ -66,7 +69,7 @@ export const payTicket = async (req: Request, res: Response, next: NextFunction)
                     email,
                     name: name
                 }
-        }}).json()
+        }})
 
         res.status(200).send(response)
 

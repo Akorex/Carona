@@ -11,7 +11,7 @@ export const getAllNotifications = async (req: Request, res: Response, next: Nex
         
         const user_id = req.user.userId
 
-        const notifications = await Notifications.find({user: user_id})
+        const notifications = await Notifications.find({userId: user_id})
 
         if (!notifications){
             logger.info(`END: Get All Notifications Service`)
@@ -48,7 +48,7 @@ export const getNotification = async (req: Request, res: Response, next: NextFun
         const user_id = req.user.userId
         const notification_id = req.params.id
 
-        const notification = await Notifications.findOne({_id: notification_id, user: user_id})
+        const notification = await Notifications.findOne({_id: notification_id, userId: user_id})
 
         if(!notification){
             logger.info(`END: Get Notification Service`)

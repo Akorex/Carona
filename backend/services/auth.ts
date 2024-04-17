@@ -15,7 +15,7 @@ export const welcomeNotificationService = async (firstName: string, userId: any)
     await Notifications.create({
         title,
         message,
-        user: userId
+        userId
     })
 
 }
