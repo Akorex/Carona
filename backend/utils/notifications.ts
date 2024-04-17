@@ -1,3 +1,5 @@
+import mongoose from "mongoose"
+
 
 interface NotificationTimestamp{
     createdAt: Date,
@@ -8,7 +10,7 @@ interface IBasicNotification extends NotificationTimestamp{
     _id: any,
     title: string,
     message: string,
-    user: any,
+    user: mongoose.ObjectId,
     isReadFlag: boolean
 }
 

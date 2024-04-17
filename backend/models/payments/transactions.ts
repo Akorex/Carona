@@ -6,8 +6,10 @@ const transactionSchema = new mongoose.Schema({
         ref: 'User'
     },
     transactionId: {
-        type: Number,
-        trim: true
+        type: String,
+        trim: true,
+        unique: true,
+        required: true
     },
     paymentStatus: {
         type: String,
@@ -33,6 +35,6 @@ const transactionSchema = new mongoose.Schema({
     timestamps: true
 })
 
-const Transaction = mongoose.model('Transaction', transactionSchema)
+const Transactions = mongoose.model('Transaction', transactionSchema)
 
-export default Transaction
+export default Transactions
