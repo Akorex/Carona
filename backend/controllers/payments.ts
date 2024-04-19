@@ -54,7 +54,7 @@ export const payTicket = async (req: Request, res: Response, next: NextFunction)
 
         logger.info(`Transaction created successfully in database. Fetching Flutterwave API`)
 
-
+        try{
         const response = await axios.post("https://api.flutterwave.com/v3/payments", {
             headers: {
                 Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`
@@ -64,6 +64,7 @@ export const payTicket = async (req: Request, res: Response, next: NextFunction)
                 tx_ref: newTransaction.transactionId,
                 amount: newTransaction.amount,
                 currency: newTransaction.currency,
+                redirect_url: 'https://carona-fe.netlify.app/',
                 
                 customer: {
                     email,
@@ -71,10 +72,14 @@ export const payTicket = async (req: Request, res: Response, next: NextFunction)
                 }
         }})
 
-        res.status(200).send(response)
 
+        //res.status(200).send(response)
     }catch(error){
-        logger.error(`Failed to pay ticket`)
+        logger.error(`Error while communicating with Flutterwave API`)
+        console.log(error)
+    }
+    }catch(error){
+        logger.error(`Failed to pay ticket ${error}`)
         next(error)
     }
 }
