@@ -341,5 +341,12 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
 
 
 export const deleteAccount = async (req: Request, res: Response, next: NextFunction) => {
+    try{
+
+    }catch(error){
+        
+    }
 
 }
+
+
