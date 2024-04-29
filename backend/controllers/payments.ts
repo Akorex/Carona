@@ -57,7 +57,7 @@ export const payTicket = async (req: Request, res: Response, next: NextFunction)
         try{
         const instance = axios.create({
                 baseURL: 'https://api.flutterwave.com/v3/payments',
-                headers: {Authorization: `Bearer FLWSECK_TEST-389c4e3d544f843273647ed68dacbe6a-X`}
+                headers: {Authorization: `Bearer ${FLW_SECRET_KEY}`}
               });
 
         const response = await instance.post("/", {
