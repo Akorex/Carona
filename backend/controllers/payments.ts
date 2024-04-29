@@ -55,12 +55,12 @@ export const payTicket = async (req: Request, res: Response, next: NextFunction)
         logger.info(`Transaction created successfully in database. Fetching Flutterwave API`)
 
         try{
-        const response = await axios.post("https://api.flutterwave.com/v3/payments", {
-            headers: {
-                Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`
-            },
+        const instance = axios.create({
+                baseURL: 'https://api.flutterwave.com/v3/payments',
+                headers: {Authorization: `Bearer FLWSECK_TEST-389c4e3d544f843273647ed68dacbe6a-X`}
+              });
 
-            json: {
+        const response = await instance.post("/", {
                 tx_ref: newTransaction.transactionId,
                 amount: newTransaction.amount,
                 currency: newTransaction.currency,
@@ -69,13 +69,11 @@ export const payTicket = async (req: Request, res: Response, next: NextFunction)
                 customer: {
                     email,
                     name: name
-                }
         }})
 
 
-        //res.status(200).send(response)
+        res.status(200).send(response.data)
     }catch(error){
-        logger.error(`Error while communicating with Flutterwave API`)
         console.log(error)
     }
     }catch(error){
