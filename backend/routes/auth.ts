@@ -16,6 +16,7 @@ import {
 } from '../validators/auth'
 import joiMiddleware from "../middlewares/joiMiddleware";
 import isLoggedIn from '../middlewares/authentication'
+import { googleSignIn } from "../controllers/socialLogin/google";
 
 
 const authRouter = Router()
@@ -27,5 +28,6 @@ authRouter.post('/forgot-password', forgotPassword)
 authRouter.post('reset-password', resetPassword)
 authRouter.patch('/change-password', isLoggedIn, changePassword)
 authRouter.post('/delete-account', isLoggedIn, deleteAccount)
+authRouter.get('/google/signin', googleSignIn)
 
 export default authRouter

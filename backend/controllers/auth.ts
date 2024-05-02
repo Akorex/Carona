@@ -349,4 +349,3 @@ export const deleteAccount = async (req: Request, res: Response, next: NextFunct
 
 }
 
-
