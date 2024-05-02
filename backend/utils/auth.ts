@@ -3,6 +3,7 @@ import {compareSync, genSaltSync, hashSync} from "bcryptjs"
 import { verify, sign, JwtPayload } from 'jsonwebtoken'
 import {jwt_secret, jwt_lifetime} from "../config/config"
 import otpGenerator from 'otp-generator'
+import { google } from 'googleapis'
 
 
 interface ISchemaDefault{
@@ -114,4 +115,21 @@ export const createAccessToken = (id: any) => {
 
 export const checkValidity = (value: string, otherValue: string) => {
     return compareSync(value, otherValue)
+}
+
+export const getGoogleUserProfile = async (accessToken: string) => {
+    const {data} = await google.people('v1').people.get({
+        access_token: accessToken,
+        resourceName: 'people/me',
+        personFields: 'names,emailAddresses'
+    })
+
+    const profile = {
+        firstName : data.names?.[0].givenName ?? '',
+        lastName : data.names?.[0].familyName ?? ' ',
+        email: data.emailAddresses?.[0].value ?? ' '
+    }
+
+    return profile
+
 }

@@ -6,6 +6,7 @@ import { GOOGLE_CLIENT_ID,
     GOOGLE_REDIRECT_URL
  } from "../../config/config";
  import logger from "../../utils/logger";
+import { getGoogleUserProfile } from "../../utils/auth";
 
 
 
@@ -36,3 +37,26 @@ export const googleSignIn = async (req: Request, res: Response, next: NextFuncti
     }
 
 }
+
+export const googleSignUp = async (req: Request, res: Response, next: NextFunction) => {
+    try{
+
+        const authCode = (req.query?.code as string) ?? ''
+
+        google.options({auth: oauth2Client})
+
+        const {tokens} = await oauth2Client.getToken(authCode)
+        oauth2Client.setCredentials(tokens)
+
+        if (typeof tokens.access_token == 'string'){
+            const userProfile = await getGoogleUserProfile(tokens.access_token)
+
+            res.status(200).send(userProfile)
+        }
+
+    }catch(error){
+        logger.error(`Error signing up with google`)
+        next(error)
+    }
+}
+
