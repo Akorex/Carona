@@ -124,6 +124,8 @@ export const getGoogleUserProfile = async (accessToken: string) => {
         personFields: 'names,emailAddresses'
     })
 
+    console.log(data)
+
     const profile = {
         firstName : data.names?.[0].givenName ?? '',
         lastName : data.names?.[0].familyName ?? ' ',

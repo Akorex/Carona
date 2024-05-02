@@ -5,7 +5,7 @@ import {
     email, 
     password,
     passwordConfirm,
-    gender
+    //gender
 } from "./globalSchemas"
 
 
@@ -15,7 +15,7 @@ export const registerUserValidator = Joi.object({
     email,
     password,
     passwordConfirm,
-    gender
+    //gender
 })
 
 export const loginUserValidator = Joi.object({

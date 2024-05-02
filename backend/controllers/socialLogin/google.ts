@@ -6,7 +6,12 @@ import { GOOGLE_CLIENT_ID,
     GOOGLE_REDIRECT_URL
  } from "../../config/config";
  import logger from "../../utils/logger";
-import { getGoogleUserProfile } from "../../utils/auth";
+import { createAccessToken, generateHashedValue, generateOTP, getBasicUserDetails, getGoogleUserProfile } from "../../utils/auth";
+import User from "../../models/auth";
+import {welcomeEmailService} from '../../services/auth'
+import { AuthResponseData } from "../../utils/auth";
+import {successResponse} from '../../utils/responses'
+import {StatusCodes} from 'http-status-codes'
 
 
 
@@ -17,8 +22,10 @@ const oauth2Client = new google.auth.OAuth2(
 )
 
 
-export const googleSignIn = async (req: Request, res: Response, next: NextFunction) => {
+export const googleSignUp = async (req: Request, res: Response, next: NextFunction) => {
     try{
+
+        logger.info(`START: Sign-Up with Google Service`)
         const scopes = ['https://www.googleapis.com/auth/userinfo.email', 
         'https://www.googleapis.com/auth/userinfo.profile']
 
@@ -38,11 +45,10 @@ export const googleSignIn = async (req: Request, res: Response, next: NextFuncti
 
 }
 
-export const googleSignUp = async (req: Request, res: Response, next: NextFunction) => {
+export const googleSignUpCallback = async (req: Request, res: Response, next: NextFunction) => {
     try{
 
         const authCode = (req.query?.code as string) ?? ''
-
         google.options({auth: oauth2Client})
 
         const {tokens} = await oauth2Client.getToken(authCode)
@@ -51,8 +57,39 @@ export const googleSignUp = async (req: Request, res: Response, next: NextFuncti
         if (typeof tokens.access_token == 'string'){
             const userProfile = await getGoogleUserProfile(tokens.access_token)
 
-            res.status(200).send(userProfile)
+
+            const existingUser = await User.findOne({email: userProfile.email})
+
+            if (existingUser){
+                logger.info(`END: Sign Up with Google Service`)
+                return 
+            }
+
+            const otp = generateOTP()
+            const user = await User.create({
+                firstName: userProfile.firstName,
+                lastName: userProfile.lastName,
+                email: userProfile.email,
+                password: generateHashedValue(otp), // random not necessary
+            })
+
+            await welcomeEmailService(user.firstName, user.email)
+            logger.info(`END: Sign Up with Google Service`)
+
+            successResponse<AuthResponseData>(res,
+                StatusCodes.CREATED,
+                `Sucessfully created account`,
+                {user: getBasicUserDetails(user), jwt: createAccessToken(user._id)}
+            )
+
+
         }
+
+   
+       
+
+
+
 
     }catch(error){
         logger.error(`Error signing up with google`)
