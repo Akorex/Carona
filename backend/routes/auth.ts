@@ -7,7 +7,8 @@ import {
     resetPassword,
     changePassword,
     verifyUser,
-    loadVerifyUser
+    loadVerifyUser,
+    renderResetForm
 } from '../controllers/auth'
 
 import {
@@ -25,6 +26,7 @@ authRouter.post('/verifyUser', verifyUser)
 authRouter.get('/verifyUser', loadVerifyUser)
 authRouter.post('/login', joiMiddleware(loginUserValidator), loginUser)
 authRouter.post('/forgot-password', forgotPassword)
+authRouter.get('/reset-password', renderResetForm)
 authRouter.post('/reset-password', resetPassword)
 authRouter.patch('/change-password', isLoggedIn, changePassword)
 authRouter.post('/delete-account', isLoggedIn, deleteAccount)
