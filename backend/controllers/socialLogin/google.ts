@@ -8,7 +8,7 @@ import { GOOGLE_CLIENT_ID,
  import logger from "../../utils/logger";
 import { createAccessToken, generateHashedValue, generateOTP, getBasicUserDetails, getGoogleUserProfile } from "../../utils/auth";
 import User from "../../models/auth";
-import {welcomeEmailService} from '../../services/auth'
+import {welcomeEmailService, welcomeNotificationService} from '../../services/auth'
 import { AuthResponseData } from "../../utils/auth";
 import {successResponse} from '../../utils/responses'
 import {StatusCodes} from 'http-status-codes'
@@ -34,9 +34,9 @@ export const googleSignUp = async (req: Request, res: Response, next: NextFuncti
             scope: scopes
         })
 
-        res.status(200).send({url})
+        //res.status(200).send({url})
 
-        //res.redirect(url)
+        res.redirect(url)
 
     }catch(error){
         logger.error(`Error signing up with google`)
@@ -74,6 +74,7 @@ export const googleSignUpCallback = async (req: Request, res: Response, next: Ne
             })
 
             await welcomeEmailService(user.firstName, user.email)
+            await welcomeNotificationService(user.firstName, user._id)
             logger.info(`END: Sign Up with Google Service`)
 
             successResponse<AuthResponseData>(res,

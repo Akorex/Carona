@@ -26,9 +26,7 @@ export interface IBasicUser extends Timestamps {
     _id: any,
     firstName: string,
     lastName: string,
-    phoneNumber: any,
     email: string,
-    gender: string
 }
 
 interface IJWToken {
@@ -86,9 +84,7 @@ export const getBasicUserDetails = (user: IBasicUser) => {
         _id,
         firstName,
         lastName,
-        phoneNumber,
         email,
-        gender,
         createdAt,
         updatedAt
     } = user
@@ -98,8 +94,6 @@ export const getBasicUserDetails = (user: IBasicUser) => {
         firstName,
         lastName,
         email,
-        phoneNumber,
-        gender,
         createdAt,
         updatedAt
     }
@@ -124,7 +118,6 @@ export const getGoogleUserProfile = async (accessToken: string) => {
         personFields: 'names,emailAddresses'
     })
 
-    console.log(data)
 
     const profile = {
         firstName : data.names?.[0].givenName ?? '',
