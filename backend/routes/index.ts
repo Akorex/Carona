@@ -7,9 +7,10 @@ import routesRouter from "./routes";
 
 const router = Router()
 router.use('/auth', authRouter)
+router.use('/routes', routesRouter)
 router.use('/dashboard/notifications', notificationRouter)
 router.use('/dashboard/payments', paymentRouter)
 router.use('/dashboard/trips', tripsRouter)
-router.use('/dashboard/routes', routesRouter)
+
 
 export default router
