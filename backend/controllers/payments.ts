@@ -1,4 +1,4 @@
-import Transactions from "../models/payments/transactions";
+import Transactions from "../models/transactions";
 import {Request, Response, NextFunction} from 'express'
 import logger from '../utils/logger'
 import User from "../models/auth";
