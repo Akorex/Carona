@@ -5,9 +5,13 @@ import connectDB from './config/db'
 import router from './routes'
 import errorHandler from './middlewares/errorHandler'
 import notFound from './middlewares/notFound'
+import swaggerUI from 'swagger-ui-express'
+import YAML from 'yamljs'
 
 
 const app: Application = express()
+
+const swaggerDocument = YAML.load('./swagger.yaml')
 
 // set up
 const port = config.port
@@ -20,6 +24,9 @@ app.use(express.json())
 app.get('/', (req: Request, res: Response) => {
     res.send('<h1> Carona - A Carpooling Platform </h1>')
 })
+
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument))
+
 app.use(`/api/v${apiVersion}`, router)
 
 // middlewares

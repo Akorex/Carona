@@ -34,9 +34,9 @@ export const googleSignUp = async (req: Request, res: Response, next: NextFuncti
             scope: scopes
         })
 
-        //res.status(200).send({url})
+        res.status(200).send({url})
 
-        res.redirect(url)
+        //res.redirect(url)
 
     }catch(error){
         logger.error(`Error signing up with google`)
