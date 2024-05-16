@@ -86,11 +86,6 @@ export const googleSignUpCallback = async (req: Request, res: Response, next: Ne
 
         }
 
-   
-       
-
-
-
 
     }catch(error){
         logger.error(`Error signing up with google`)
