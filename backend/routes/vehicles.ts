@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {isAdmin} from "../middlewares/authentication";
+import {isAdmin, isLoggedIn} from "../middlewares/authentication";
 import { createVehicle, 
     deleteVehicle, 
     getAllVehicles, 

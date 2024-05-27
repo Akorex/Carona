@@ -1,6 +1,7 @@
 import {Request, Response, NextFunction} from "express"
 import ApiError from "./errorHandler/api-error"
 import { isTokenValid } from "../utils/auth"
+import User from "../models/auth";
 
 
 // Define a custom interface to include the 'user' property
@@ -9,7 +10,6 @@ declare global {
       interface Request {
         user: {
           userId: string;
-          role?: string;
         };
       }
     }
@@ -37,7 +37,7 @@ export const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-export const isAdmin = (
+export const isAdmin =  (
   req: Request,
   res: Response,
   next: NextFunction
@@ -47,12 +47,19 @@ export const isAdmin = (
   isLoggedIn(
       req,
       res,
-      () => {
+      async () => {
           if (! req.user){
               return next(ApiError.badRequest(`You are not authorized to use this resource.`))
           }
 
-          if (req.user.role !== 'admin'){
+          let userId = req.user.userId
+          const user = await User.findOne({_id: userId})
+
+          if (!user){
+            return next(ApiError.badRequest(`User is not found. Not authorized`))
+          }
+
+          if (user.role !== 'admin'){
               return next(ApiError.badRequest(`Admin access required.`))
           }
 
