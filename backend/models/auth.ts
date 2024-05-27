@@ -49,6 +49,12 @@ const userSchema = new mongoose.Schema({
         type: Number
     },
 
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
+
     profileImageUrl: getTypeAndDefaultValue(String, null),
     accountCreateToken: getTypeAndDefaultValue(String, null),
     accountCreateTokenExpires: getTypeAndDefaultValue(Date, null),

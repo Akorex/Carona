@@ -25,7 +25,8 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             email,
             password,
             gender,
-            phoneNumber
+            phoneNumber,
+            role
         } = req.body
 
         const existingUser = await User.findOne({email})
@@ -48,6 +49,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             password: generateHashedValue(password),
             gender,
             phoneNumber,
+            role,
             verificationToken: otp
         })
 
