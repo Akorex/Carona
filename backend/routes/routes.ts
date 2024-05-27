@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {isLoggedIn} from "../middlewares/authentication";
+import {isAdmin} from "../middlewares/authentication";
 import {
     createRoute,
     deleteRoute,
@@ -9,9 +9,9 @@ import {
 
 const routesRouter = Router()
 
-routesRouter.post(`/create-route`, isLoggedIn, createRoute) // will update to only allow admins create routes
-routesRouter.get('/:id', isLoggedIn, getRoute)
-routesRouter.get('/', isLoggedIn, getRoutes)
-routesRouter.delete('/:id', isLoggedIn, deleteRoute)
+routesRouter.post(`/create`, isAdmin, createRoute) // will update to only allow admins create routes
+routesRouter.get('/:id', isAdmin, getRoute)
+routesRouter.get('/', isAdmin, getRoutes)
+routesRouter.delete('/:id', isAdmin, deleteRoute)
 
 export default routesRouter
