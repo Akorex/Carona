@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import isLoggedIn from '../middlewares/authentication'
+import {isLoggedIn} from '../middlewares/authentication'
 import {
     getAllNotifications,
     getNotification

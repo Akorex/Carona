@@ -1,5 +1,5 @@
 import { Router } from "express";
-import isLoggedIn from "../middlewares/authentication";
+import {isAdmin} from "../middlewares/authentication";
 import { createVehicle, 
     deleteVehicle, 
     getAllVehicles, 
@@ -8,10 +8,10 @@ import { createVehicle,
 
 const vehicleRouter = Router()
 
-vehicleRouter.post('/create', createVehicle)
-vehicleRouter.get('/', getAllVehicles)
+vehicleRouter.post('/create', isAdmin, createVehicle)
+vehicleRouter.get('/', isAdmin, getAllVehicles)
 vehicleRouter.get('/:id', getVehicle)
-vehicleRouter.delete('/:id', deleteVehicle)
-vehicleRouter.patch('/:id', updateVehicleDetails)
+vehicleRouter.delete('/:id', isAdmin, deleteVehicle)
+vehicleRouter.patch('/:id', isAdmin, updateVehicleDetails)
 
 export default vehicleRouter

@@ -16,7 +16,7 @@ import {
     registerUserValidator
 } from '../validators/auth'
 import joiMiddleware from "../middlewares/joiMiddleware";
-import isLoggedIn from '../middlewares/authentication'
+import {isLoggedIn} from '../middlewares/authentication'
 import { googleSignUp, googleSignUpCallback } from "../controllers/google";
 
 

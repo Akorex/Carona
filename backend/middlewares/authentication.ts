@@ -9,13 +9,13 @@ declare global {
       interface Request {
         user: {
           userId: string;
-          name?: string;
+          role?: string;
         };
       }
     }
   }
 
-const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
+export const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers['authorization']
 
     if (!authHeader){
@@ -37,4 +37,27 @@ const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-export default isLoggedIn
+export const isAdmin = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // check if user is logged in
+
+  isLoggedIn(
+      req,
+      res,
+      () => {
+          if (! req.user){
+              return next(ApiError.badRequest(`You are not authorized to use this resource.`))
+          }
+
+          if (req.user.role !== 'admin'){
+              return next(ApiError.badRequest(`Admin access required.`))
+          }
+
+          next()
+      }
+  )
+  
+}
