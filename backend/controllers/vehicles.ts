@@ -151,7 +151,7 @@ export const updateVehicleDetails = async (
 ) => {
     try{
         logger.info(`START: Update Vehicle Service`)
-        const vehicleId = req.params.Id
+        const vehicleId = req.params.id
 
         const {
             type,
