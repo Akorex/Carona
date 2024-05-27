@@ -5,7 +5,7 @@ import {
     deleteRoute,
     getRoute,
     getRoutes
-} from "../controllers/caronaGo/routes"
+} from "../controllers/routes"
 
 const routesRouter = Router()
 

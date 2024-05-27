@@ -4,13 +4,13 @@ import {google} from 'googleapis'
 import { GOOGLE_CLIENT_ID,
     GOOGLE_OAUTH_SECRET,
     GOOGLE_REDIRECT_URL
- } from "../../config/config";
- import logger from "../../utils/logger";
-import { createAccessToken, generateHashedValue, generateOTP, getBasicUserDetails, getGoogleUserProfile } from "../../utils/auth";
-import User from "../../models/auth";
-import {welcomeEmailService, welcomeNotificationService} from '../../services/auth'
-import { AuthResponseData } from "../../utils/auth";
-import {successResponse} from '../../utils/responses'
+ } from "../config/config";
+ import logger from "../utils/logger";
+import { createAccessToken, generateHashedValue, generateOTP, getBasicUserDetails, getGoogleUserProfile } from "../utils/auth";
+import User from "../models/auth";
+import {welcomeEmailService, welcomeNotificationService} from '../services/auth'
+import { AuthResponseData } from "../utils/auth";
+import {successResponse} from '../utils/responses'
 import {StatusCodes} from 'http-status-codes'
 
 

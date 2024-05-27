@@ -17,7 +17,7 @@ import {
 } from '../validators/auth'
 import joiMiddleware from "../middlewares/joiMiddleware";
 import isLoggedIn from '../middlewares/authentication'
-import { googleSignUp, googleSignUpCallback } from "../controllers/socialLogin/google";
+import { googleSignUp, googleSignUpCallback } from "../controllers/google";
 
 
 const authRouter = Router()

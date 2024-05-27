@@ -1,10 +1,10 @@
 import {Request, Response, NextFunction} from 'express'
-import logger from '../../utils/logger'
-import Routes from '../../models/routes'
-import { fetchDistance, fetchStops } from '../../utils/routes'
-import {errorResponse, successResponse} from '../../utils/responses'
+import logger from '../utils/logger'
+import Routes from '../models/routes'
+import { fetchDistance, fetchStops } from '../utils/routes'
+import {errorResponse, successResponse} from '../utils/responses'
 import { StatusCodes } from 'http-status-codes'
-import { getBasicRouteInfo } from '../../utils/routes'
+import { getBasicRouteInfo } from '../utils/routes'
 
 export const createRoute = async (req: Request, res: Response, next: NextFunction) => {
     try{
