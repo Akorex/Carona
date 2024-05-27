@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import {getTypeAndDefaultValue} from '../utils/auth'
 
 const vehicleSchema = new mongoose.Schema({
     type: {
@@ -29,7 +30,8 @@ const vehicleSchema = new mongoose.Schema({
     driverId: {
         type: Schema.Types.ObjectId,
         required: true
-    }
+    },
+    vehicleIconUrl: getTypeAndDefaultValue(String, null)
 })
 
 const Vehicles = mongoose.model(`Vehicles`, vehicleSchema)
