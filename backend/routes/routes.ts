@@ -4,14 +4,16 @@ import {
     createRoute,
     deleteRoute,
     getRoute,
-    getRoutes
+    getAllRoutes,
+    updateRouteDetails
 } from "../controllers/routes"
 
 const routesRouter = Router()
 
-routesRouter.post(`/create`, isAdmin, createRoute) // will update to only allow admins create routes
-routesRouter.get('/:id', isAdmin, getRoute)
-routesRouter.get('/', isAdmin, getRoutes)
+routesRouter.post(`/create`, isAdmin, createRoute) 
+routesRouter.get('/', getAllRoutes)
+routesRouter.get('/:id', getRoute)
 routesRouter.delete('/:id', isAdmin, deleteRoute)
+routesRouter.patch('/:id', isAdmin, updateRouteDetails)
 
 export default routesRouter

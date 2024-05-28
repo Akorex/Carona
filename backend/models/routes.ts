@@ -11,14 +11,14 @@ const RouteSchema = new mongoose.Schema({
         required: true
     },
 
-    stops: [{
-        type: [String] // stops available from Google Maps
-    }],
-
     distance: {
         type: Number, // all distances are in kilometers
         required: true
-    }
+    },
+
+    estimatedTravelTime: {
+        type: Number // estimated time in minutes
+    },
 })
 
 const Routes = mongoose.model('Routes', RouteSchema)

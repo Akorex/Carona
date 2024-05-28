@@ -1,7 +1,6 @@
 import {Request, Response, NextFunction} from 'express'
 import logger from '../utils/logger'
 import Routes from '../models/routes'
-import { fetchDistance, fetchStops } from '../utils/routes'
 import {errorResponse, successResponse} from '../utils/responses'
 import { StatusCodes } from 'http-status-codes'
 import { getBasicRouteInfo } from '../utils/routes'
@@ -9,16 +8,19 @@ import { getBasicRouteInfo } from '../utils/routes'
 export const createRoute = async (req: Request, res: Response, next: NextFunction) => {
     try{
         logger.info(`START: Create Route Service`)
-        const {start, end} = req.body
-
-        // google maps api will fetch bus stops and distance 
-        const distance = await fetchDistance(start, end)
-        const stops = await fetchStops(start, end)
-
-        const newRoute = await Routes.create({
+        const {
             start,
             end,
-            distance
+            distance,
+            estimatedTravelTime
+        } = req.body
+
+
+        await Routes.create({
+            start,
+            end,
+            distance,
+            estimatedTravelTime
         })
 
         logger.info(`END: Create Route Service`)
@@ -40,9 +42,16 @@ export const deleteRoute = async (req: Request, res: Response, next: NextFunctio
         logger.info(`START: Delete Route Service`)
         const routeId = req.params.id
 
-        const route = await Routes.findOneAndDelete({_id: routeId})
+        await Routes.findOneAndDelete({_id: routeId})
 
         logger.info(`END: Delete Route Service`)
+
+        successResponse(
+            res,
+            StatusCodes.OK,
+            `Successfully deleted route`,
+            null
+        )
 
 
     }catch(error){
@@ -80,17 +89,27 @@ export const getRoute = async (req: Request, res: Response, next: NextFunction) 
 
 }
 
-export const getRoutes = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllRoutes = async (req: Request, res: Response, next: NextFunction) => {
     try{
-        logger.info(`START: Get Routes Service`)
+        logger.info(`START: Get All Routes Service`)
         
         const routes = await Routes.find({})
-        logger.info(`END: Get Routes Service`)
-        successResponse(res,
-            StatusCodes.OK,
-            `Routes found successfully`,
-            {routes}
-        )
+
+        if (routes.length > 0){
+            logger.info(`END: Get All Routes Service`)
+            successResponse(
+                res,
+                StatusCodes.OK,
+                `Routes found successfully`,
+                {routes}
+            )
+        }else{
+            logger.info(`END: Get All Routes Service`)
+            return errorResponse(res,
+                StatusCodes.NOT_FOUND,
+                `No Route found`
+            )
+        }
 
     }catch(error){
         logger.error(`Could not get routes ${error}`)
@@ -100,4 +119,46 @@ export const getRoutes = async (req: Request, res: Response, next: NextFunction)
 }
 
 
+export const updateRouteDetails = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try{
+        logger.info(`START: Update Route Service`)
+        const routeId = req.params.id
 
+        const {
+            start,
+            end,
+            distance,
+            estimatedTravelTime
+        } = req.body
+
+        const route = await Routes.findOneAndUpdate({_id: routeId},
+            {start, end, distance, estimatedTravelTime},
+            {new: true, runValidators: true}
+        )
+
+        if (!route){
+            logger.info(`END: Update Route Service`)
+            return errorResponse(
+                res,
+                StatusCodes.NOT_FOUND,
+                `Route not found`
+            )
+        }
+
+        logger.info(`END: Update Route Service`)
+        successResponse(
+            res,
+            StatusCodes.OK,
+            `Route detail updated successfully`,
+            route
+        )
+
+    }catch(error){
+        logger.error(`Could not update route detail ${error}`)
+        next(error)
+    }
+}
