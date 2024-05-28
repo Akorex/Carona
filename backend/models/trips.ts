@@ -1,6 +1,6 @@
 import mongoose, {Schema} from "mongoose";
 
-const TripSchema = new mongoose.Schema({
+const tripSchema = new mongoose.Schema({
     start: {
         type: String,
         required: [true, 'A take-off location is required for every trip']
@@ -12,11 +12,12 @@ const TripSchema = new mongoose.Schema({
     },
 
     passengers: [{
-        type: Schema.Types.ObjectId
+        type: Schema.Types.ObjectId,
+        ref: "User"
     }],
 
     distance: {
-        type: Number, // all distances are measured in kilometers
+        type: String, // all distances are measured in kilometers
         required: true
     },
 
@@ -24,15 +25,19 @@ const TripSchema = new mongoose.Schema({
         type: Number, // all prices are in NGN
         required: true
     },
+    vehicleId: {
+        type: Schema.Types.ObjectId,
+        ref: "Vehicles"
+    },
 
-    vehicleType: {
-        type: String,
-        enum: ['van', 'bus', 'car'],
-        default: 'car'
+    ratings: {
+        type: Number,
+        enum: [1, 2, 3, 4, 5],
+        default: 5
     }
 
 }, {timestamps: true})
 
-const Trips = mongoose.model('Trips', TripSchema)
+const Trips = mongoose.model('Trips', tripSchema)
 
 export default Trips
