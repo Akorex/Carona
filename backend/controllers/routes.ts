@@ -80,7 +80,7 @@ export const getRoute = async (req: Request, res: Response, next: NextFunction) 
         successResponse(res,
             StatusCodes.OK,
             `Route found successfully`,
-            {route: getBasicRouteInfo(route)}
+            route
         )
     }catch(error){
         logger.error(`Could not get route ${error}`)
@@ -101,7 +101,7 @@ export const getAllRoutes = async (req: Request, res: Response, next: NextFuncti
                 res,
                 StatusCodes.OK,
                 `Routes found successfully`,
-                {routes}
+                routes
             )
         }else{
             logger.info(`END: Get All Routes Service`)

@@ -12,12 +12,12 @@ const RouteSchema = new mongoose.Schema({
     },
 
     distance: {
-        type: Number, // all distances are in kilometers
+        type: String, // all distances are in kilometers
         required: true
     },
 
     estimatedTravelTime: {
-        type: Number // estimated time in minutes
+        type: String // estimated time in minutes
     },
 })
 

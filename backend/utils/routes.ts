@@ -1,7 +1,7 @@
 interface Iroute {
     start: string,
     end: string,
-    distance: number
+    distance: string
 }
 
 
