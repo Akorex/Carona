@@ -9,6 +9,8 @@ import { calculateFare,
 generateEstimatedTravelTime } from "../utils/trips";
 import { getBasicTripDetails } from "../utils/trips";
 
+
+
 export const createTrip = async (
     req: Request,
     res: Response,
@@ -66,15 +68,16 @@ export const createTrip = async (
             vehicleId
             })
 
-            logger.info(`END: Create Trip Service`)
-            successResponse(
-                res,
-                StatusCodes.OK,
-                `Trip created succesfully`,
-                {trip: getBasicTripDetails(newTrip)}
-            )
 
-        // payment service
+        logger.info(`END: Create Trip Service`)
+        successResponse(
+            res,
+            StatusCodes.OK,
+            `Trip created succesfully`,
+            {trip: getBasicTripDetails(newTrip)}
+        )
+
+
 
         }
 

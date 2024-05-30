@@ -4,6 +4,6 @@ import { payTicket } from "../controllers/payments";
 
 
 const paymentRouter = Router()
-paymentRouter.post('/pay', isLoggedIn, payTicket)
+paymentRouter.post('/pay/:id', isLoggedIn, payTicket)
 
 export default paymentRouter
