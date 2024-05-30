@@ -12,8 +12,8 @@ const routesRouter = Router()
 
 routesRouter.post(`/create`, isAdmin, createRoute) 
 routesRouter.get('/', getAllRoutes)
-routesRouter.get('/:id', getRoute)
-routesRouter.delete('/:id', isAdmin, deleteRoute)
-routesRouter.patch('/:id', isAdmin, updateRouteDetails)
+routesRouter.get('/:routeId', getRoute)
+routesRouter.delete('/:routeId', isAdmin, deleteRoute)
+routesRouter.patch('/:routeId', isAdmin, updateRouteDetails)
 
 export default routesRouter

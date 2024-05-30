@@ -40,7 +40,7 @@ export const createRoute = async (req: Request, res: Response, next: NextFunctio
 export const deleteRoute = async (req: Request, res: Response, next: NextFunction) => {
     try{
         logger.info(`START: Delete Route Service`)
-        const routeId = req.params.id
+        const routeId = req.params.routeId
 
         await Routes.findOneAndDelete({_id: routeId})
 
@@ -64,7 +64,7 @@ export const deleteRoute = async (req: Request, res: Response, next: NextFunctio
 export const getRoute = async (req: Request, res: Response, next: NextFunction) => {
     try{
         logger.info(`START: Get Route Service`)
-        const routeId = req.params.id
+        const routeId = req.params.routeId
 
         const route = await Routes.findOne({_id: routeId})
 
@@ -134,7 +134,7 @@ export const updateRouteDetails = async (
 ) => {
     try{
         logger.info(`START: Update Route Service`)
-        const routeId = req.params.id
+        const routeId = req.params.routeId
 
         const {
             start,
