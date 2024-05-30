@@ -16,10 +16,10 @@ router.use('/vehicles', vehicleRouter)
 
 // dashboard endpoints
 
-router.use('/dashboard/notifications', notificationRouter)
-router.use('/dashboard/payments', paymentRouter)
-router.use('/dashboard', createTripRouter)
-router.use('/dashboard/trips', tripsRouter)
+router.use('/notifications', notificationRouter)
+router.use('/payments', paymentRouter)
+router.use('/routes', createTripRouter)
+router.use('/trips', tripsRouter)
 
 
 export default router

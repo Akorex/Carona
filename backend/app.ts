@@ -24,7 +24,7 @@ app.get('/', (req: Request, res: Response) => {
 })
 
 
-app.use(`/api/v${apiVersion}`, router)
+app.use(`/api/`, router)
 
 // middlewares
 app.use(notFound)

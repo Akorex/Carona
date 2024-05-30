@@ -276,7 +276,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
         const {email} = req.body
 
         const resetToken = generateRandomToken()
-        const passwordResetUrl = `http://localhost:${config.port}/api/v1/auth/reset-password?token=${resetToken}`
+        const passwordResetUrl = `http://localhost:${config.port}/api/auth/reset-password?token=${resetToken}`
 
         const user = await User.findOneAndUpdate({email}, {
             passwordResetToken: resetToken,
@@ -364,6 +364,7 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
 }
 
 export const renderResetForm = async (req: Request, res: Response, next: NextFunction) => {
+    res.send('<h1> Hello It Works </h1>')
     
 }
 

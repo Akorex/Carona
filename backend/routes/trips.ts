@@ -7,8 +7,7 @@ import { createTrip,
 
 const tripsRouter = Router()
 export const createTripRouter = Router()
-createTripRouter.post('/routes/:routeId/trips', isLoggedIn, createTrip) // intended for caronago
-//tripsRouter.post('/routes/:routeId/trips', isLoggedIn, createTrip) 
+createTripRouter.post('/:routeId/trips', isLoggedIn, createTrip) // intended for caronago
 tripsRouter.post('/', isLoggedIn, createTrip) // intended for caronashare
 tripsRouter.get('/:tripId', isLoggedIn, getTrip)
 tripsRouter.get('/', isLoggedIn, getAllTrips)
