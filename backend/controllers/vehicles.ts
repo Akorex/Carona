@@ -3,6 +3,7 @@ import Vehicles from "../models/vehicles";
 import {successResponse, errorResponse} from '../utils/responses'
 import logger from '../utils/logger'
 import { StatusCodes } from "http-status-codes";
+import { getBasicVehicleDetails } from "../utils/vehicles";
 
 
 
@@ -37,7 +38,7 @@ export const createVehicle = async (
         successResponse(res,
             StatusCodes.OK,
             `Created a new vehicle successfully`,
-            null
+            {vehicle: getBasicVehicleDetails(newVehicle)}
         )
 
     }catch(error){
@@ -101,7 +102,7 @@ export const getVehicle = async (
         successResponse(res,
             StatusCodes.OK,
             `Successfully fetched vehicle`,
-            vehicle
+            {vehicle: getBasicVehicleDetails(vehicle)}
         )
 
     }catch(error){
@@ -121,12 +122,21 @@ export const getAllVehicles = async (
         const vehicles = await Vehicles.find({})
 
 
-        if (vehicles.length > 0){
+        if (vehicles && vehicles.length > 0){
+                const formattedVehicles = vehicles.map((vehicle) => ({
+                    type: vehicle.type,
+                    model: vehicle.model,
+                    colour: vehicle.colour,
+                    plateNumber: vehicle.plateNumber,
+                    availableSeats: vehicle.availableSeats,
+                    driverId: vehicle.driverId
+                }))
+
             logger.info(`END: Get All Vehicles Service`)
             successResponse(res,
                 StatusCodes.OK,
                 `Successfully fetched vehicles`,
-                vehicles
+                {vehicles: formattedVehicles, noOfvehicles: formattedVehicles.length}
             )
         }
         else{
@@ -171,7 +181,7 @@ export const updateVehicleDetails = async (
             successResponse(res,
                 StatusCodes.OK,
                 `Successfully updated details`,
-                vehicle
+                {vehicle: getBasicVehicleDetails(vehicle)}
             )
         }else{
             logger.info(`END: Update Vehicle Service`)

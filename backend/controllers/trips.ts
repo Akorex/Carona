@@ -243,7 +243,7 @@ export const addPassengerToTrip = async (
         successResponse(res,
             StatusCodes.OK,
             `Successfully added passengers to Trip`,
-            trip
+            {trip: getBasicTripDetails(trip)}
         )
 
 

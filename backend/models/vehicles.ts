@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import {getTypeAndDefaultValue} from '../utils/auth'
 
+
 const vehicleSchema = new mongoose.Schema({
     type: {
         type: String,
@@ -12,9 +13,7 @@ const vehicleSchema = new mongoose.Schema({
         required: true
     },
 
-    colour: {
-        type: String
-    },
+    colour: getTypeAndDefaultValue(String, null),
 
     plateNumber: {
         type: String,
