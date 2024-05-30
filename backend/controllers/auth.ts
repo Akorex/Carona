@@ -6,7 +6,7 @@ import { errorResponse, successResponse } from "../utils/responses";
 import { StatusCodes } from "http-status-codes";
 import { generateHashedValue, AuthResponseData, generateRandomToken, IBasicUser } from "../utils/auth";
 import { getBasicUserDetails, createAccessToken, checkValidity } from "../utils/auth";
-import {resetTokenExpiresIn} from "../config/config"
+import {resetTokenExpiresIn, TOKEN_EXPIRY} from "../config/config"
 import {config} from '../config/config'
 import { changePasswordEmailService, 
     passwordTokenEmailService, 
@@ -50,7 +50,8 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             gender,
             phoneNumber,
             role,
-            verificationToken: otp
+            accountCreateToken: otp,
+            accountCreateTokenExpires: new Date(Date.now() + TOKEN_EXPIRY).toISOString()
         })
 
         
@@ -84,9 +85,17 @@ export const verifyUser = async (req: Request, res: Response, next: NextFunction
         const {token} = req.body
         const encodedEmail = req.query.email
 
+
+        if (!req.query.email || typeof encodedEmail !== 'string'){
+            logger.info(`END: Verify Account Service`)
+            return errorResponse(res,
+                StatusCodes.BAD_REQUEST,
+                `Invald email parameter`
+            )
+        }
+
         if (typeof encodedEmail === 'string'){
-            const email = decodeURIComponent(encodedEmail)
-            
+            const email = decodeURIComponent(encodedEmail)     
             const user = await User.findOne({email})
             
             if(!user) {
@@ -96,16 +105,30 @@ export const verifyUser = async (req: Request, res: Response, next: NextFunction
                     `Could not find user`)
                 }
 
-            const storedToken = user.verificationToken
+            const storedToken = user.accountCreateToken
+            const storedTokenExpiry: any = user.accountCreateTokenExpires
 
             if (storedToken !== token){
                 logger.info(`END: Verify Account Service`)
                 return errorResponse(res,
                     StatusCodes.BAD_REQUEST,
-                    `You have entered the wrong pin`)
+                    `You have entered the wrong token`)
                 }
 
-            if (storedToken === token){
+
+            if (storedToken === token && storedTokenExpiry < Date.now()){
+                logger.info(`END: Verify Account Service`)
+                return errorResponse(res,
+                        StatusCodes.BAD_REQUEST,
+                        `The token you entered has expired.`
+                )
+
+                // future implementation to simply resend the token on expiry
+                // would require updating the database and new expiry
+
+            }
+
+            if (storedToken === token && storedTokenExpiry > Date.now()){
                 const user = await User.findOneAndUpdate({email}, 
                     {isVerified: true},
                      {new: true, runValidators: true})

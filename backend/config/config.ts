@@ -18,3 +18,4 @@ export const GOOGLE_REDIRECT_URL = process.env.GOOGLE_REDIRECT_URL
 export const BASE_FARE = Number(process.env.BASE_FARE) || 0
 export const DISTANCE_RATE = Number(process.env.DISTANCE_RATE) || 0
 export const TIME_RATE = Number(process.env.TIME_RATE) || 0
+export const TOKEN_EXPIRY = Number(process.env.TOKEN_EXPIRY) * 1000 || 0
