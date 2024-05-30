@@ -3,6 +3,7 @@ import logger from '../utils/logger'
 import Routes from '../models/routes'
 import {errorResponse, successResponse} from '../utils/responses'
 import { StatusCodes } from 'http-status-codes'
+import { getBasicRouteDetails } from '../utils/routes'
 
 export const createRoute = async (req: Request, res: Response, next: NextFunction) => {
     try{
@@ -15,7 +16,7 @@ export const createRoute = async (req: Request, res: Response, next: NextFunctio
         } = req.body
 
 
-        await Routes.create({
+        const newRoute = await Routes.create({
             start,
             end,
             distance,
@@ -26,7 +27,7 @@ export const createRoute = async (req: Request, res: Response, next: NextFunctio
         successResponse(res,
             StatusCodes.OK,
             `Route created successfully`,
-            null
+            {route: getBasicRouteDetails(newRoute)}
         )
 
     }catch(error){
@@ -79,7 +80,7 @@ export const getRoute = async (req: Request, res: Response, next: NextFunction) 
         successResponse(res,
             StatusCodes.OK,
             `Route found successfully`,
-            route
+            {route: getBasicRouteDetails(route)}
         )
     }catch(error){
         logger.error(`Could not get route ${error}`)
@@ -94,13 +95,21 @@ export const getAllRoutes = async (req: Request, res: Response, next: NextFuncti
         
         const routes = await Routes.find({})
 
-        if (routes.length > 0){
+        if (routes && routes.length > 0){
+            const formattedRoutes = routes.map((route) => ({
+                start: route.start,
+                end: route.end,
+                estimatedTravelTime: route.estimatedTravelTime,
+                distance: route.distance
+            }))
+
+
             logger.info(`END: Get All Routes Service`)
             successResponse(
                 res,
                 StatusCodes.OK,
                 `Routes found successfully`,
-                routes
+                formattedRoutes
             )
         }else{
             logger.info(`END: Get All Routes Service`)
@@ -153,7 +162,7 @@ export const updateRouteDetails = async (
             res,
             StatusCodes.OK,
             `Route detail updated successfully`,
-            route
+            {route: getBasicRouteDetails(route)}
         )
 
     }catch(error){
