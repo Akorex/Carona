@@ -130,7 +130,7 @@ export const getAllVehicles = async (
             )
         }
         else{
-            logger.info(`END: GEt All Vehicles Service`)
+            logger.info(`END: Get All Vehicles Service`)
             return errorResponse(res,
                 StatusCodes.NOT_FOUND,
                 `No vehicle found.`

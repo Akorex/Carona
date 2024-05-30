@@ -16,14 +16,12 @@ export const createTrip = async (
         const routeId = req.params.id
         const userId = req.user.userId
 
-        // to do => ensure only signed-in users can createTrips
-        // to do => automatically update caronago trips with passengerId
-        // to do => automatically ensure caronashare trip creator is automatically in the passengerId 
+        const passengerId = userId
 
-        const {start, end, passengers, vehicleId} = req.body
+        const {start, end, vehicleId} = req.body
         const tripData: {start: string; end: string; distance: string} = {start: '', end: '', distance: ''}
 
-        if (!passengers || !vehicleId){
+        if (!passengerId || !vehicleId){
             logger.info(`END: Create Trip Service`)
             return errorResponse(
                 res,
@@ -59,7 +57,7 @@ export const createTrip = async (
         const newTrip = await Trips.create({
             ...tripData,
             price,
-            passengers,
+            passengers: passengerId,
             vehicleId
             })
 
@@ -129,7 +127,8 @@ export const getAllTrips = async (
 
         const trips = await Trips.find({passengers: {$in: [userId]}})
 
-        if (!trips){
+        if (!trips || trips.length === 0){
+            logger.info(`No trips found for the passenger with ID: ${userId}`)
             logger.info(`END: Get All Trips Service`)
             return errorResponse(res,
                 StatusCodes.NOT_FOUND,
@@ -151,6 +150,46 @@ export const getAllTrips = async (
     }
 
 }
+
+
+
+export const updateTripRating = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try{
+        logger.info(`START: Update Ratings Service`)
+        const userId = req.user.userId
+        const tripId = req.params.id
+        const ratings = req.body
+
+        const trip = await Trips.findOneAndUpdate({_id: tripId, passengers: {$in: [userId]}}, 
+            {ratings: ratings},
+            {new: true, runValidators: true}
+        )
+
+        if (!trip){
+            logger.info(`END: Update Ratings Service`)
+            return errorResponse(res,
+                StatusCodes.BAD_REQUEST,
+                `Could not update trip ratings as Trip is invalid`
+            )
+        }
+
+        logger.info(`END: Update Ratings Service`)
+        successResponse(res,
+            StatusCodes.OK,
+            `Successfully updated ratings`,
+            null
+        )
+
+    }catch(error){
+        logger.error(`Could not update trip rating ${error}`)
+        next(error)
+    }
+}
+
 
 
 // restricted to CaronaShare Only => future work needed
