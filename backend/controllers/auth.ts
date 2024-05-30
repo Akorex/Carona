@@ -72,7 +72,7 @@ export const loadVerifyUser = async (req: Request, res: Response, next: NextFunc
     return successResponse(
         res,
         StatusCodes.OK,
-        `Message passed successfully`,
+        `Please check your mail for a token to verify your account.`,
         null
     )
 }
@@ -144,11 +144,11 @@ export const verifyUser = async (req: Request, res: Response, next: NextFunction
                     await welcomeEmailService(user.firstName, user.email)
                     
                     logger.info(`END: Verify Account Service`)   
-                    successResponse<AuthResponseData>(
+                    successResponse(
                         res,
                         StatusCodes.CREATED,
-                        `Successfully created account`,
-                        {user: getBasicUserDetails(user), jwt: createAccessToken(user._id)}
+                        `Successfully verified account. You can sign-in now.`,
+                        null
                     )
             }
         }
