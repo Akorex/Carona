@@ -22,7 +22,7 @@ const tripSchema = new mongoose.Schema({
     },
 
     price: {
-        type: Number, // all prices are in NGN
+        type: String, // all prices are in NGN
         required: true
     },
     vehicleId: {
