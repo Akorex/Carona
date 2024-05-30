@@ -17,7 +17,8 @@ const RouteSchema = new mongoose.Schema({
     },
 
     estimatedTravelTime: {
-        type: String // estimated time in minutes
+        type: String,// estimated time in minutes
+        required: true
     },
 })
 

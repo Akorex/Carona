@@ -4,7 +4,10 @@ import Trips from "../models/trips";
 import Routes from "../models/routes";
 import { errorResponse, successResponse } from "../utils/responses";
 import { StatusCodes } from "http-status-codes";
-import { calculateFare, generateDistance } from "../utils/trips";
+import { calculateFare, 
+    generateDistance,
+generateEstimatedTravelTime } from "../utils/trips";
+import { getBasicTripDetails } from "../utils/trips";
 
 export const createTrip = async (
     req: Request,
@@ -19,7 +22,7 @@ export const createTrip = async (
         const passengerId = userId
 
         const {start, end, vehicleId} = req.body
-        const tripData: {start: string; end: string; distance: string} = {start: '', end: '', distance: ''}
+        const tripData: {start: string; end: string; distance: string; estimatedTravelTime: string} = {start: '', end: '', distance: '', estimatedTravelTime: ''}
 
         if (!passengerId || !vehicleId){
             logger.info(`END: Create Trip Service`)
@@ -44,12 +47,14 @@ export const createTrip = async (
             tripData.start = route.start
             tripData.end = route.end
             tripData.distance = route.distance
+            tripData.estimatedTravelTime = route.estimatedTravelTime
 
         }else{
             // route is not predefined -> likely a CaronaShare route
             tripData.start = start
             tripData.end = end
             tripData.distance = generateDistance()
+            tripData.estimatedTravelTime = generateEstimatedTravelTime()
         }
 
         const price = calculateFare(tripData.distance)
@@ -66,7 +71,7 @@ export const createTrip = async (
                 res,
                 StatusCodes.OK,
                 `Trip created succesfully`,
-                newTrip
+                {trip: getBasicTripDetails(newTrip)}
             )
 
         // payment service
@@ -106,7 +111,7 @@ export const getTrip = async (
         successResponse(res,
             StatusCodes.OK,
             `Trip successfully fetched.`,
-            trip
+            {trip: getBasicTripDetails(trip)}
         )
 
     }catch(error){
@@ -137,12 +142,24 @@ export const getAllTrips = async (
 
         }
 
-        logger.info(`END: Get All Trips Service`)
-        successResponse(res,
-            StatusCodes.OK,
-            `Successfully fetched trips`,
-            trips
-        )
+
+        if (trips && trips.length > 0){
+            const formattedTrips = trips.map((trip) => ({
+                start: trip.start,
+                end: trip.end,
+                estimatedTravelTime: trip.estimatedTravelTime,
+                price: trip.price
+            }))
+
+            logger.info(`END: Get All Trips Service`)
+            successResponse(res,
+                StatusCodes.OK,
+                `Successfully fetched trips`,
+                {trips: formattedTrips, noOfTrips: formattedTrips.length}
+            )
+
+
+        }
 
     }catch(error){
         logger.error(`Could not get All trips ${error}`)

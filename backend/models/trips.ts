@@ -11,6 +11,11 @@ const tripSchema = new mongoose.Schema({
         required: [true, 'A destination is required for every trip']
     },
 
+    estimatedTravelTime: {
+        type: String,
+        required: true
+    },
+
     passengers: [{
         type: Schema.Types.ObjectId,
         ref: "User"
