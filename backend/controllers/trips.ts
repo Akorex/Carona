@@ -18,7 +18,7 @@ export const createTrip = async (
 ) => {
     try{
         logger.info(`START: Create Trip Service`)
-        const routeId = req.params.id
+        const routeId = req.params.routeId
         const userId = req.user.userId
 
         const passengerId = userId
@@ -59,7 +59,8 @@ export const createTrip = async (
             tripData.estimatedTravelTime = generateEstimatedTravelTime()
         }
 
-        const price = calculateFare(tripData.distance)
+        const price = calculateFare(tripData.distance, tripData.estimatedTravelTime)
+
         
         const newTrip = await Trips.create({
             ...tripData,
@@ -95,7 +96,7 @@ export const getTrip = async (
     try{
         logger.info(`START: Get Trip Service`)
 
-        const tripId = req.params.id
+        const tripId = req.params.tripId
         const userId = req.user.userId
 
         const trip = await Trips.findOne({_id: tripId})
@@ -181,7 +182,7 @@ export const updateTripRating = async (
     try{
         logger.info(`START: Update Ratings Service`)
         const userId = req.user.userId
-        const tripId = req.params.id
+        const tripId = req.params.tripId
         const ratings = req.body
 
         const trip = await Trips.findOneAndUpdate({_id: tripId, passengers: {$in: [userId]}}, 
@@ -222,7 +223,7 @@ export const addPassengerToTrip = async (
     try{
         logger.info(`START: Add Passenger Service`)
         const passengers = req.body
-        const tripId = req.params.id
+        const tripId = req.params.tripId
         const userId = req.user.userId
 
         const trip = await Trips.findOneAndUpdate({_id: tripId, passengers: {$in: [userId]}}, 

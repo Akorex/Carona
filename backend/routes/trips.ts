@@ -6,9 +6,11 @@ import { createTrip,
  } from "../controllers/trips";
 
 const tripsRouter = Router()
-tripsRouter.post('/:id', isLoggedIn, createTrip)
-tripsRouter.post('/', isLoggedIn, createTrip)
-tripsRouter.get('/:id', isLoggedIn, getTrip)
+export const createTripRouter = Router()
+createTripRouter.post('/routes/:routeId/trips', isLoggedIn, createTrip) // intended for caronago
+//tripsRouter.post('/routes/:routeId/trips', isLoggedIn, createTrip) 
+tripsRouter.post('/', isLoggedIn, createTrip) // intended for caronashare
+tripsRouter.get('/:tripId', isLoggedIn, getTrip)
 tripsRouter.get('/', isLoggedIn, getAllTrips)
 
 export default tripsRouter

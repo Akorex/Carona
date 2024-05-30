@@ -5,6 +5,7 @@ import paymentRouter from './payments'
 import tripsRouter from "./trips";
 import routesRouter from "./routes";
 import vehicleRouter from "./vehicles";
+import { createTripRouter } from "./trips";
 
 const router = Router()
 router.use('/auth', authRouter)
@@ -17,6 +18,7 @@ router.use('/vehicles', vehicleRouter)
 
 router.use('/dashboard/notifications', notificationRouter)
 router.use('/dashboard/payments', paymentRouter)
+router.use('/dashboard', createTripRouter)
 router.use('/dashboard/trips', tripsRouter)
 
 

@@ -15,3 +15,6 @@ export const FLW_SECRET_KEY = process.env.FLW_SECRET_KEY
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_OAUTH_ID
 export const GOOGLE_OAUTH_SECRET = process.env.GOOGLE_OAUTH_SECRET
 export const GOOGLE_REDIRECT_URL = process.env.GOOGLE_REDIRECT_URL
+export const BASE_FARE = Number(process.env.BASE_FARE) || 0
+export const DISTANCE_RATE = Number(process.env.DISTANCE_RATE) || 0
+export const TIME_RATE = Number(process.env.TIME_RATE) || 0
