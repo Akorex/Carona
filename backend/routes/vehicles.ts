@@ -10,8 +10,8 @@ const vehicleRouter = Router()
 
 vehicleRouter.post('/create', isAdmin, createVehicle)
 vehicleRouter.get('/', isAdmin, getAllVehicles)
-vehicleRouter.get('/:id', getVehicle)
-vehicleRouter.delete('/:id', isAdmin, deleteVehicle)
-vehicleRouter.patch('/:id', isAdmin, updateVehicleDetails)
+vehicleRouter.get('/:vehicleId', getVehicle)
+vehicleRouter.delete('/:vehicleId', isAdmin, deleteVehicle)
+vehicleRouter.patch('/:vehicleId', isAdmin, updateVehicleDetails)
 
 export default vehicleRouter

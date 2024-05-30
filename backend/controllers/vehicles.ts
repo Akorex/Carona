@@ -56,7 +56,7 @@ export const deleteVehicle = async (
     try{
         logger.info(`START: Delete Vehicle Service`)
 
-        const vehicleId = req.params.id
+        const vehicleId = req.params.vehicleId
 
         await Vehicles.findByIdAndDelete({_id: vehicleId})
 
@@ -85,7 +85,7 @@ export const getVehicle = async (
     try{
         logger.info(`START: Get Vehicle Service`)
 
-        const vehicleId = req.params.id
+        const vehicleId = req.params.vehicleId
 
         const vehicle = await Vehicles.findOne({_id: vehicleId})
 
@@ -161,7 +161,7 @@ export const updateVehicleDetails = async (
 ) => {
     try{
         logger.info(`START: Update Vehicle Service`)
-        const vehicleId = req.params.id
+        const vehicleId = req.params.vehicleId
 
         const {
             type,
