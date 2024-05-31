@@ -17,8 +17,9 @@
     "ts-node": "^10.9.2",
     "winston": "^3.11.0"
   },
+  "type": "module",
   "scripts": {
-    "start": "node backend/index.ts",
+    "start": "nodemon backend/index.ts",
     "vercel-build": "tsc"
   },
   "build": "tsc",

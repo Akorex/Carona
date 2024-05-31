@@ -5,3 +5,5 @@ backend/node_modules
 backend/log
 log
 node_modules
+.js
+backend/*.js
