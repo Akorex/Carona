@@ -15,14 +15,12 @@
     "nodemon": "^3.0.3",
     "otp-generator": "^4.0.1",
     "ts-node": "^10.9.2",
+    "typescript": "^5.4.5",
     "winston": "^3.11.0"
   },
-  "type": "module",
   "scripts": {
-    "start": "nodemon backend/index.ts",
-    "vercel-build": "tsc"
+    "start": "nodemon backend/index.ts"
   },
-  "build": "tsc",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^4.17.21",
