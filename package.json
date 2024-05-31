@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "nodemon backend/app.ts",
-    "vercel-build": "tsc && npm install "
+    "vercel-build": "tsc"
   },
   "build": "tsc",
   "devDependencies": {
