@@ -44,6 +44,8 @@ export const deleteRoute = async (req: Request, res: Response, next: NextFunctio
 
         await Routes.findOneAndDelete({_id: routeId})
 
+        // update controller for when route is not found
+
         logger.info(`END: Delete Route Service`)
 
         successResponse(

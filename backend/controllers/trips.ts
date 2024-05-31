@@ -8,6 +8,7 @@ import { calculateFare,
     generateDistance,
 generateEstimatedTravelTime } from "../utils/trips";
 import { getBasicTripDetails } from "../utils/trips";
+import Vehicles from "../models/vehicles";
 
 
 
@@ -19,14 +20,11 @@ export const createTrip = async (
     try{
         logger.info(`START: Create Trip Service`)
         const routeId = req.params.routeId
-        const userId = req.user.userId
+        const passengerId = req.user.userId
 
-        const passengerId = userId
+        const tripData: {start: string; end: string; distance: string; estimatedTravelTime: string, vehicleId: any} = {start: '', end: '', distance: '', estimatedTravelTime: '', vehicleId: ''}
 
-        const {start, end, vehicleId} = req.body
-        const tripData: {start: string; end: string; distance: string; estimatedTravelTime: string} = {start: '', end: '', distance: '', estimatedTravelTime: ''}
-
-        if (!passengerId || !vehicleId){
+        if (!passengerId){
             logger.info(`END: Create Trip Service`)
             return errorResponse(
                 res,
@@ -38,6 +36,18 @@ export const createTrip = async (
         if (routeId){
             // route are predefined -> likely a CaronaGo route
             const route = await Routes.findOne({_id: routeId})
+            const vehicle = await Vehicles.aggregate([{ $sample: { size: 1 } }])
+
+            if (!vehicle){
+                logger.info(`END: Create Trip Service`)
+                return errorResponse(
+                    res,
+                    StatusCodes.BAD_GATEWAY,
+                    `Could not create Trip as Vehicle was not successfully fetched`
+                )
+            }
+
+            const vehicleId = vehicle.map(obj => obj._id)
             if (!route){
                 logger.info(`END: Create Trip Service`)
                 return errorResponse(res,
@@ -50,13 +60,16 @@ export const createTrip = async (
             tripData.end = route.end
             tripData.distance = route.distance
             tripData.estimatedTravelTime = route.estimatedTravelTime
+            tripData.vehicleId = vehicleId
 
         }else{
             // route is not predefined -> likely a CaronaShare route
+            const {start, end, vehicleId} = req.body
             tripData.start = start
             tripData.end = end
             tripData.distance = generateDistance()
             tripData.estimatedTravelTime = generateEstimatedTravelTime()
+            tripData.vehicleId = vehicleId
         }
 
         const price = calculateFare(tripData.distance, tripData.estimatedTravelTime)
@@ -65,8 +78,7 @@ export const createTrip = async (
         const newTrip = await Trips.create({
             ...tripData,
             price,
-            passengers: passengerId,
-            vehicleId
+            passengers: passengerId
             })
 
 
@@ -77,8 +89,6 @@ export const createTrip = async (
             `Trip created succesfully`,
             {trip: getBasicTripDetails(newTrip)}
         )
-
-
 
         }
 

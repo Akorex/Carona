@@ -30,7 +30,9 @@ export const generateDistance = () => {
 }
 
 export const generateEstimatedTravelTime = () => {
-    return "5 mins"
+
+    const time: Number = Math.floor(Math.random() * 1000) + 1;
+    return time + " mins"
 }
 
 

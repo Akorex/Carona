@@ -10,7 +10,7 @@ const vehicleRouter = Router()
 
 vehicleRouter.post('/create', isAdmin, createVehicle)
 vehicleRouter.get('/', isAdmin, getAllVehicles)
-vehicleRouter.get('/:vehicleId', getVehicle)
+vehicleRouter.get('/:vehicleId', isLoggedIn, getVehicle)
 vehicleRouter.delete('/:vehicleId', isAdmin, deleteVehicle)
 vehicleRouter.patch('/:vehicleId', isAdmin, updateVehicleDetails)
 

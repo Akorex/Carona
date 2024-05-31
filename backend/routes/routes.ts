@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {isAdmin} from "../middlewares/authentication";
+import {isAdmin, isLoggedIn} from "../middlewares/authentication";
 import {
     createRoute,
     deleteRoute,
@@ -11,8 +11,8 @@ import {
 const routesRouter = Router()
 
 routesRouter.post(`/create`, isAdmin, createRoute) 
-routesRouter.get('/', getAllRoutes)
-routesRouter.get('/:routeId', getRoute)
+routesRouter.get('/', isLoggedIn, getAllRoutes)
+routesRouter.get('/:routeId', isLoggedIn, getRoute)
 routesRouter.delete('/:routeId', isAdmin, deleteRoute)
 routesRouter.patch('/:routeId', isAdmin, updateRouteDetails)
 
