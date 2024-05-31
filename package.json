@@ -18,7 +18,7 @@
     "winston": "^3.11.0"
   },
   "scripts": {
-    "start": "nodemon backend/app.ts",
+    "start": "nodemon backend/index.ts",
     "vercel-build": "tsc"
   },
   "build": "tsc",
