@@ -6,4 +6,4 @@ backend/log
 log
 node_modules
 .js
-backend/*.js
+build

@@ -2,12 +2,11 @@
   "compilerOptions": {
     "target": "es2016",
     "lib": ["es6", "dom"],
-    "types": ["reflect-metadata"],
     "module": "commonjs",
     "rootDir": "backend",
     "resolveJsonModule": true,
     "allowJs": true,
-    "outDir": "build",
+    "outDir": "./build",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,

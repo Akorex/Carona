@@ -1,5 +1,5 @@
 import Notifications from "../models/notifications";
-import logger from "../utils/logger";
+import logger from "./logger";
 import connectDB from "../config/db";
 import {config} from "../config/config"
 import 'dotenv/config'
