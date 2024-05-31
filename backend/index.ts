@@ -12,7 +12,7 @@ const app: Application = express()
 
 
 // set up
-const port = config.port
+const port = config.port || 4000
 const mongoUrl = config.uri
 const apiVersion = config.apiVersion
 app.use(express.json())
