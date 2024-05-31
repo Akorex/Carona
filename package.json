@@ -19,6 +19,7 @@
   "scripts": {
     "start": "nodemon backend/app.ts"
   },
+  "build": "tsc",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^4.17.21",
