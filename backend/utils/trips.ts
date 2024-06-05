@@ -1,5 +1,6 @@
 import { BASE_FARE, TIME_RATE, DISTANCE_RATE} from "../config/config"
-
+import Vehicles from "../models/vehicles"
+import Routes from "../models/routes"
 
 interface IBasicTrip{
     start: string,
@@ -7,6 +8,39 @@ interface IBasicTrip{
     estimatedTravelTime: string,
     price: string
 }
+
+
+
+export const validateVehicleAndRoute = async (
+    vehicleId: any,
+    routeId: any
+) => {
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 export const calculateFare = (distance: string, time: string) => {

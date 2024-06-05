@@ -4,6 +4,7 @@ import {successResponse, errorResponse} from '../utils/responses'
 import logger from '../utils/logger'
 import { StatusCodes } from "http-status-codes";
 import { getBasicVehicleDetails } from "../utils/vehicles";
+import ApiError from "../middlewares/errorHandler/api-error";
 
 
 
@@ -195,5 +196,27 @@ export const updateVehicleDetails = async (
     }catch(error){
         logger.error(`Could not update vehicle detail ${error}`)
         next(error)
+    }
+}
+
+export const updateVehicleSeats = async (
+    vehicleId : string
+) => {
+    try{
+
+        logger.info(`START: Update Vehicle Seats Service`)
+
+        const vehicle = await Vehicles.findOneAndUpdate({_id: vehicleId}, 
+            {$inc: { availableSeats: -1 }}, 
+            {new: true, runValidators: true}
+        )
+
+        if (!vehicle){
+            return ApiError.badRequest(`Could not find vehicle`)
+        }
+
+        return vehicle
+    }catch(error){
+        logger.error(`Could not update seat info ${error}`)
     }
 }

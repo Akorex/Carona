@@ -9,6 +9,7 @@ import { calculateFare,
 generateEstimatedTravelTime } from "../utils/trips";
 import { getBasicTripDetails } from "../utils/trips";
 import Vehicles from "../models/vehicles";
+import { updateVehicleSeats } from "./vehicles";
 
 
 
@@ -38,6 +39,9 @@ export const createTrip = async (
             const route = await Routes.findOne({_id: routeId})
             const vehicle = await Vehicles.aggregate([{ $sample: { size: 1 } }])
 
+
+            // validating info on the vehicles
+
             if (!vehicle){
                 logger.info(`END: Create Trip Service`)
                 return errorResponse(
@@ -48,9 +52,25 @@ export const createTrip = async (
             }
 
             const vehicleId = vehicle.map(obj => obj._id)
+            const availableSeats:number = (vehicle.map(obj => obj.availableSeats))[0]
+
+            if (availableSeats <= 0){
+                logger.info(`END: Create Trip Service`)
+
+                return errorResponse(
+                    res,
+                    StatusCodes.BAD_REQUEST,
+                    `Could not create Trip as Seats has finished.`
+
+                )
+            }
+
+
+
             if (!route){
                 logger.info(`END: Create Trip Service`)
-                return errorResponse(res,
+                return errorResponse(
+                    res,
                     StatusCodes.BAD_REQUEST,
                     `Could not create Trip as Route is invalid`
                 )
@@ -80,7 +100,8 @@ export const createTrip = async (
             price,
             passengers: passengerId
             })
-
+        
+        const newVehicleInfo = await updateVehicleSeats(tripData.vehicleId)  //reduce the number of available seats in the vehicle by 1
 
         logger.info(`END: Create Trip Service`)
         successResponse(
