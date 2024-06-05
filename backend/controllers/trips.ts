@@ -1,15 +1,14 @@
 import { Request, Response, NextFunction} from "express";
 import logger from "../utils/logger";
 import Trips from "../models/trips";
-import Routes from "../models/routes";
 import { errorResponse, successResponse } from "../utils/responses";
 import { StatusCodes } from "http-status-codes";
 import { calculateFare, 
-    generateDistance,
-generateEstimatedTravelTime } from "../utils/trips";
+prepareInfoForCaronaGoTrip,
+prepareInfoForCaronaShareTrip} from "../utils/trips";
 import { getBasicTripDetails } from "../utils/trips";
-import Vehicles from "../models/vehicles";
 import { updateVehicleSeats } from "./vehicles";
+import ApiError from "../middlewares/errorHandler/api-error";
 
 
 
@@ -23,7 +22,12 @@ export const createTrip = async (
         const routeId = req.params.routeId
         const passengerId = req.user.userId
 
-        const tripData: {start: string; end: string; distance: string; estimatedTravelTime: string, vehicleId: any} = {start: '', end: '', distance: '', estimatedTravelTime: '', vehicleId: ''}
+        let tripData: {start: string; 
+            end: string; 
+            distance: string; 
+            estimatedTravelTime: string, 
+            vehicleId: any, price: string} = 
+            {start: '', end: '', distance: '', estimatedTravelTime: '', vehicleId: '', price: ''}
 
         if (!passengerId){
             logger.info(`END: Create Trip Service`)
@@ -35,73 +39,48 @@ export const createTrip = async (
         }
 
         if (routeId){
-            // route are predefined -> likely a CaronaGo route
-            const route = await Routes.findOne({_id: routeId})
-            const vehicle = await Vehicles.aggregate([{ $sample: { size: 1 } }])
-
-
-            // validating info on the vehicles
-
-            if (!vehicle){
+            logger.info(`START: Carona Go Trip`)
+            
+            const response  = await prepareInfoForCaronaGoTrip(routeId)
+            if (response instanceof ApiError){
                 logger.info(`END: Create Trip Service`)
                 return errorResponse(
                     res,
                     StatusCodes.BAD_GATEWAY,
-                    `Could not create Trip as Vehicle was not successfully fetched`
+                    response.message
                 )
             }
 
-            const vehicleId = vehicle.map(obj => obj._id)
-            const availableSeats:number = (vehicle.map(obj => obj.availableSeats))[0]
-
-            if (availableSeats <= 0){
-                logger.info(`END: Create Trip Service`)
-
-                return errorResponse(
-                    res,
-                    StatusCodes.BAD_REQUEST,
-                    `Could not create Trip as Seats has finished.`
-
-                )
-            }
-
-
-
-            if (!route){
-                logger.info(`END: Create Trip Service`)
-                return errorResponse(
-                    res,
-                    StatusCodes.BAD_REQUEST,
-                    `Could not create Trip as Route is invalid`
-                )
-            }
-
-            tripData.start = route.start
-            tripData.end = route.end
-            tripData.distance = route.distance
-            tripData.estimatedTravelTime = route.estimatedTravelTime
-            tripData.vehicleId = vehicleId
+            tripData = response
 
         }else{
-            // route is not predefined -> likely a CaronaShare route
+
+            logger.info(`START: Carona Share Trip`)
             const {start, end, vehicleId} = req.body
-            tripData.start = start
-            tripData.end = end
-            tripData.distance = generateDistance()
-            tripData.estimatedTravelTime = generateEstimatedTravelTime()
-            tripData.vehicleId = vehicleId
+
+            const response = await prepareInfoForCaronaShareTrip(start, end, vehicleId)
+
+            if (response instanceof ApiError){
+                logger.info(`END: Create Trip Service`)
+                return errorResponse(
+                    res,
+                    StatusCodes.BAD_GATEWAY,
+                    response.message
+                )
+            }
+
+            tripData = response
+
         }
 
-        const price = calculateFare(tripData.distance, tripData.estimatedTravelTime)
 
         
         const newTrip = await Trips.create({
             ...tripData,
-            price,
             passengers: passengerId
             })
         
-        const newVehicleInfo = await updateVehicleSeats(tripData.vehicleId)  //reduce the number of available seats in the vehicle by 1
+        await updateVehicleSeats(tripData.vehicleId)  //reduce the number of available seats in the vehicle by 1
 
         logger.info(`END: Create Trip Service`)
         successResponse(
@@ -118,6 +97,11 @@ export const createTrip = async (
         next(error)
     }
 }
+
+
+
+
+
 
 export const getTrip = async (
     req: Request,
