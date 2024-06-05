@@ -3,9 +3,7 @@ import logger from "../utils/logger";
 import Trips from "../models/trips";
 import { errorResponse, successResponse } from "../utils/responses";
 import { StatusCodes } from "http-status-codes";
-import { calculateFare, 
-prepareInfoForCaronaGoTrip,
-prepareInfoForCaronaShareTrip} from "../utils/trips";
+import {  prepareInfoForCaronaGoTrip, prepareInfoForCaronaShareTrip} from "../utils/trips";
 import { getBasicTripDetails } from "../utils/trips";
 import { updateVehicleSeats } from "./vehicles";
 import ApiError from "../middlewares/errorHandler/api-error";

@@ -5,6 +5,7 @@ import logger from '../utils/logger'
 import { StatusCodes } from "http-status-codes";
 import { getBasicVehicleDetails } from "../utils/vehicles";
 import ApiError from "../middlewares/errorHandler/api-error";
+import User from "../models/auth"
 
 
 
@@ -99,11 +100,15 @@ export const getVehicle = async (
             )
         }
 
+        const driverId = vehicle.driverId
+
+        const driver = await User.findOne({_id: driverId})
+
         logger.info(`END: Get Vehicle Service`)
         successResponse(res,
             StatusCodes.OK,
             `Successfully fetched vehicle`,
-            {vehicle: getBasicVehicleDetails(vehicle)}
+            {vehicle: getBasicVehicleDetails(vehicle), driverDetails: driver?.firstName + ' ' + driver?.lastName}
         )
 
     }catch(error){
