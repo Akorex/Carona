@@ -21,6 +21,7 @@ export const createTrip = async (
         logger.info(`START: Create Trip Service`)
         const routeId = req.params.routeId
         const passengerId = req.user.userId
+        const {start, end, vehicleId} = req.body
 
         let tripData: {start: string; 
             end: string; 
@@ -39,7 +40,7 @@ export const createTrip = async (
         }
 
         if (routeId){
-            logger.info(`START: Carona Go Trip`)
+            logger.info(`START: Trip is in CaronaGo mode`)
             
             const response  = await prepareInfoForCaronaGoTrip(routeId)
             if (response instanceof ApiError){
@@ -55,8 +56,7 @@ export const createTrip = async (
 
         }else{
 
-            logger.info(`START: Carona Share Trip`)
-            const {start, end, vehicleId} = req.body
+            logger.info(`START: Trip is in CaronaShare mode`)
 
             const response = await prepareInfoForCaronaShareTrip(start, end, vehicleId)
 
@@ -72,22 +72,20 @@ export const createTrip = async (
             tripData = response
 
         }
-
-
-        
+    
         const newTrip = await Trips.create({
             ...tripData,
             passengers: passengerId
             })
         
-        await updateVehicleSeats(tripData.vehicleId)  //reduce the number of available seats in the vehicle by 1
+        await updateVehicleSeats(tripData.vehicleId)  
 
         logger.info(`END: Create Trip Service`)
         successResponse(
             res,
             StatusCodes.OK,
             `Trip created succesfully`,
-            {trip: getBasicTripDetails(newTrip)}
+            getBasicTripDetails(newTrip)
         )
 
         }
@@ -138,6 +136,7 @@ export const getTrip = async (
         next(error)
     }
 }
+
 
 export const getAllTrips = async (
     req: Request,

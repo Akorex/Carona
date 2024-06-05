@@ -74,29 +74,6 @@ export const prepareInfoForCaronaShareTrip = async (
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export const calculateFare = (distance: string, time: string) => {
     const baseFee = BASE_FARE
 
@@ -133,12 +110,26 @@ export const getBasicTripDetails = (trip: IBasicTrip) => {
         price
     } = trip
 
-    return {
-        start,
-        end, 
-        estimatedTravelTime,
-        price
+    const departureTime = "09:00 AM"
+    const departureHour = parseInt(departureTime.split(":")[0])
+    const departureMinute = parseInt(departureTime.split(":")[1])
+    const departureDate = new Date();
+    departureDate.setHours(departureHour, departureMinute, 0, 0);
+
+
+    const estimatedTravelTimeInMilliseconds = (parseInt(estimatedTravelTime.split(' ')[0])) * 60 * 1000
+    const arrivalTimeInMilliseconds = departureDate.getTime() + estimatedTravelTimeInMilliseconds
+
+    const arrivalTime = (new Date(arrivalTimeInMilliseconds)).toLocaleTimeString('en-US', {hour: 'numeric', minute: 'numeric', hour12: true})
+  
+    const data = {
+        trip: {start, end, estimatedTravelTime, price},
+        timingInfo: {departureTime, arrivalTime}
     }
+
+    return data
+
+    
 
 
 }
