@@ -5,6 +5,7 @@ import connectDB from './config/db'
 import router from './routes'
 import errorHandler from './middlewares/errorHandler'
 import notFound from './middlewares/notFound'
+import cors from 'cors'
 
 
 
@@ -16,6 +17,7 @@ const port = config.port || 4000
 const mongoUrl = config.uri
 const apiVersion = config.apiVersion
 app.use(express.json())
+app.use(cors())
 
 
 // routes
