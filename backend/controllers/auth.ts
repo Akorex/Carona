@@ -379,3 +379,43 @@ export const deleteAccount = async (req: Request, res: Response, next: NextFunct
 
 }
 
+
+export const getUserDetails = async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        logger.info(`START: Get User Details Service`)
+        const userId = req.user.userId
+
+        if (!userId){
+            logger.info(`END: Get User Details Service`)
+            return errorResponse(
+                res,
+                StatusCodes.BAD_REQUEST,
+                `Missing required parameters`
+            )
+        }
+
+
+        const user = await User.findOne({_id: userId})
+
+        if (!user){
+            logger.info(`END: Get User Details Service`)
+            return errorResponse(
+                res,
+                StatusCodes.NOT_FOUND,
+                `Could not find user`
+            )
+        }
+
+        logger.info(`END: Get User Details Service`)
+        successResponse(
+            res,
+            StatusCodes.OK,
+            `Succesfully fetched user info`,
+            {user: getBasicUserDetails(user)}
+        )
+
+    }catch(error){
+        logger.info(`Could not get user details ${error}`)
+        next(error)
+    }
+}

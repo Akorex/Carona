@@ -8,7 +8,8 @@ import {
     changePassword,
     verifyUser,
     loadVerifyUser,
-    renderResetForm
+    renderResetForm,
+    getUserDetails
 } from '../controllers/auth'
 
 import {
@@ -22,6 +23,7 @@ import { googleSignUp, googleSignUpCallback } from "../controllers/google";
 
 const authRouter = Router()
 authRouter.post('/register', joiMiddleware(registerUserValidator), registerUser)
+authRouter.get('/getUser/:id', isLoggedIn, getUserDetails)
 authRouter.post('/verifyUser', verifyUser)
 authRouter.get('/verifyUser', loadVerifyUser)
 authRouter.post('/login', joiMiddleware(loginUserValidator), loginUser)
