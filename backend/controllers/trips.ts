@@ -7,6 +7,8 @@ import {  prepareInfoForCaronaGoTrip, prepareInfoForCaronaShareTrip} from "../ut
 import { getBasicTripDetails } from "../utils/trips";
 import { updateVehicleSeats } from "./vehicles";
 import ApiError from "../middlewares/errorHandler/api-error";
+import { successfulCaronaGoTrip } from "../services/trips";
+import User from "../models/auth";
 
 
 
@@ -36,6 +38,20 @@ export const createTrip = async (
                 `Missing required trip parameters`
             )
         }
+
+        const user = await User.findOne({_id: passengerId})
+
+        if (!user){
+            logger.info(`END: Create Trip Service`)
+            return errorResponse(
+                res,
+                StatusCodes.BAD_GATEWAY,
+                `Couldn't fetch user details`
+            )
+        }
+
+        let firstName = user.firstName
+        let email = user.email
 
         if (routeId){
             logger.info(`START: Trip is in CaronaGo mode`)
@@ -76,7 +92,9 @@ export const createTrip = async (
             passengers: passengerId
             })
         
-        await updateVehicleSeats(tripData.vehicleId)  
+        await updateVehicleSeats(tripData.vehicleId)
+        logger.info(`Sending mail about trip`)
+        await successfulCaronaGoTrip(firstName, email)
 
         logger.info(`END: Create Trip Service`)
         successResponse(
