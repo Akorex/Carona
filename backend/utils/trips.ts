@@ -1,8 +1,4 @@
 import { BASE_FARE, TIME_RATE, DISTANCE_RATE} from "../config/config"
-import Vehicles from "../models/vehicles"
-import Routes from "../models/routes"
-import ApiError from "../middlewares/errorHandler/api-error"
-
 
 
 interface IBasicTrip{
@@ -14,48 +10,6 @@ interface IBasicTrip{
 
 
 
-export const prepareInfoForCaronaGoTrip = async (
-    routeId: any
-) => {
-    const vehicle = await Vehicles.aggregate([{ $sample: { size: 1 } }])
-    const route = await Routes.findOne({_id: routeId})
-
-    if (!vehicle || vehicle.length === 0){
-        return ApiError.badRequest(`Could not create Trip as no available Vehicle`)
-    }
-
-    if (!route){
-        return ApiError.badRequest(`Could not create Trip as route is Invalid`)
-    }
-
-    const vehicleId = vehicle[0]._id;
-    const availableSeats: number = vehicle[0].availableSeats;
-
-    if (availableSeats <= 0){
-        return ApiError.badRequest(`Could not create trip as no available seat.`)
-    }
-
-    const start = route.start
-    const end = route.end
-    const distance = route.distance
-    const estimatedTravelTime = route.estimatedTravelTime
-    const price = calculateFare(distance, estimatedTravelTime)
-    const startLatLong = route.startLatLong
-    const endLatLong = route.endLatLong
-    
-
-    return {
-        start,
-        end,
-        distance,
-        estimatedTravelTime,
-        vehicleId,
-        price,
-        startLatLong,
-        endLatLong
-    }
-
-}
 
 export const prepareInfoForCaronaShareTrip = async (
     start: string,

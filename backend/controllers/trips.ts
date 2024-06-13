@@ -3,14 +3,15 @@ import logger from "../utils/logger";
 import Trips from "../models/trips";
 import { errorResponse, successResponse } from "../utils/responses";
 import { StatusCodes } from "http-status-codes";
-import {  prepareInfoForCaronaGoTrip, prepareInfoForCaronaShareTrip} from "../utils/trips";
 import { getBasicTripDetails } from "../utils/trips";
 import { updateVehicleSeats } from "./vehicles";
 import ApiError from "../middlewares/errorHandler/api-error";
-import { successfulCaronaGoTrip } from "../services/trips";
 import User from "../models/auth";
 import { getBasicVehicleDetails } from "../utils/vehicles";
 import Vehicles from "../models/vehicles";
+import Routes from "../models/routes";
+import { calculateFare } from "../utils/trips";
+import { generateDistance, generateEstimatedTravelTime } from "../utils/trips";
 
 
 
@@ -23,14 +24,6 @@ export const createCaronaGoTrip = async (
         logger.info(`START: Create CaronaGo Trip Service`)
         const routeId = req.params.routeId
         const passengerId = req.user.userId
-
-        let tripData: {start: string; 
-            end: string; 
-            distance: string; 
-            estimatedTravelTime: string, 
-            vehicleId: any, 
-            price: string
-        } = {start: '', end: '', distance: '', estimatedTravelTime: '', vehicleId: '', price: ''}
 
         if (!passengerId){
             logger.info(`END: Create Trip Service`)
@@ -52,39 +45,57 @@ export const createCaronaGoTrip = async (
             )
         }
 
-        let firstName = user.firstName
-        let email = user.email
+        const vehicle = await Vehicles.aggregate([{ $sample: { size: 1 } }])
+        const route = await Routes.findOne({_id: routeId})
 
-        const response  = await prepareInfoForCaronaGoTrip(routeId)
-
-        if (response instanceof ApiError){
-            logger.info(`END: Create Trip Service`)
-            return errorResponse(
-                res,
-                StatusCodes.BAD_GATEWAY,
-                response.message
-            )
+        if (!vehicle || vehicle.length === 0){
+            return ApiError.badRequest(`Could not create Trip as no available Vehicle`)
+        }
+    
+        if (!route){
+            return ApiError.badRequest(`Could not create Trip as route is Invalid`)
+        }
+    
+        const vehicleId = vehicle[0]._id;
+        const availableSeats: number = vehicle[0].availableSeats;
+    
+        if (availableSeats <= 0){
+            return ApiError.badRequest(`Could not create trip as no available seat.`)
         }
 
-        tripData = response
+        const start = route.start
+        const end = route.end
+        const distance = route.distance
+        const estimatedTravelTime = route.estimatedTravelTime
+        const price = calculateFare(distance, estimatedTravelTime)
+        const startLatLong = route.startLatLong
+        const endLatLong = route.endLatLong
 
-        const vehicle = tripData.vehicleId
     
         const newTrip = await Trips.create({
-            ...tripData,
+            start,
+            end,
+            distance,
+            estimatedTravelTime,
+            price,
             passengers: passengerId
             })
         
-        await updateVehicleSeats(tripData.vehicleId)
-        logger.info(`Sending mail about trip`)
-        await successfulCaronaGoTrip(firstName, email)
+        await updateVehicleSeats(vehicleId)
+        
+        //logger.info(`Sending mail about trip`) -> removing this functionality because sending email makes response
+        //let firstName = user.firstName
+        //let email = user.email
+        //await successfulCaronaGoTrip(firstName, email) -> take longer
 
         logger.info(`END: Create Trip Service`)
         successResponse(
             res,
             StatusCodes.OK,
             `Trip created succesfully`,
-            {trip: getBasicTripDetails(newTrip), vehicle: getBasicVehicleDetails(vehicle)}
+            {trip: getBasicTripDetails(newTrip), 
+            vehicle: getBasicVehicleDetails(vehicle[0]), 
+            coordinates: {startLatLong, endLatLong}}
         )
 
         }catch(error){
@@ -105,14 +116,6 @@ export const createCaronaShareTrip = async (
         const passengerId = req.user.userId
         const {start, end, vehicleId} = req.body
 
-        let tripData: {start: string; 
-            end: string; 
-            distance: string; 
-            estimatedTravelTime: string, 
-            vehicleId: any, 
-            price: string
-        } = {start: '', end: '', distance: '', estimatedTravelTime: '', vehicleId: '', price: ''}
-
         if (!passengerId){
             logger.info(`END: Create Trip Service`)
             return errorResponse(
@@ -123,7 +126,6 @@ export const createCaronaShareTrip = async (
         }
 
         const user = await User.findOne({_id: passengerId})
-
         if (!user){
             logger.info(`END: Create Trip Service`)
             return errorResponse(
@@ -133,48 +135,54 @@ export const createCaronaShareTrip = async (
             )
         }
 
-        let firstName = user.firstName
-        let email = user.email
-
-        const response = await prepareInfoForCaronaShareTrip(start, end, vehicleId)
-
-        if (response instanceof ApiError){
+        const vehicle = await Vehicles.findOne({_id: vehicleId})
+        if (!vehicle){
             logger.info(`END: Create Trip Service`)
             return errorResponse(
                 res,
                 StatusCodes.BAD_GATEWAY,
-                response.message
+                `Couldn't fetch vehicle details`
             )
         }
-        
-        tripData = response
 
-        const vehicle = tripData.vehicleId
+
+        const distance = generateDistance()
+        const estimatedTravelTime = generateEstimatedTravelTime()
+        const price = calculateFare(distance, estimatedTravelTime)
+        const startLatLong = '6.5162173597908, 3.3905528025338283'
+        const endLatLong = '6.559633599898055, 3.3689000521288275'
+
     
         const newTrip = await Trips.create({
-            ...tripData,
+            start,
+            end, 
+            distance,
+            estimatedTravelTime,
+            price,
             passengers: passengerId
             })
         
-        await updateVehicleSeats(tripData.vehicleId)
-        logger.info(`Sending mail about trip`)
-        await successfulCaronaGoTrip(firstName, email)
+        await updateVehicleSeats(vehicleId)
+        
+        //logger.info(`Sending mail about trip`)     
+        //let firstName = user.firstName
+        //let email = user.email
+        //await successfulCaronaGoTrip(firstName, email)
 
         logger.info(`END: Create Trip Service`)
         successResponse(
             res,
             StatusCodes.OK,
             `Trip created succesfully`,
-            {trip: getBasicTripDetails(newTrip), vehicle: getBasicVehicleDetails(vehicle)}
+            {trip: getBasicTripDetails(newTrip), 
+            vehicle: getBasicVehicleDetails(vehicle),
+            coordinates: {startLatLong, endLatLong}}
         )
     }catch(error){
         logger.error(`Could not create Trip ${error}`)
         next(error)
     }
 }
-
-
-
 
 
 
@@ -213,11 +221,14 @@ export const getTrip = async (
             )
         }
 
+
         logger.info(`END: Get Trip Service`)
         successResponse(res,
             StatusCodes.OK,
             `Trip successfully fetched.`,
-            {trip: getBasicTripDetails(trip), vehicle: getBasicVehicleDetails(vehicle)}
+            {trip: getBasicTripDetails(trip), 
+            vehicle: getBasicVehicleDetails(vehicle),
+            }
         )
 
     }catch(error){
@@ -225,6 +236,45 @@ export const getTrip = async (
         next(error)
     }
 }
+
+
+export const updateTripRating = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try{
+        logger.info(`START: Update Ratings Service`)
+        const userId = req.user.userId
+        const tripId = req.params.tripId
+        const ratings = req.body
+
+        const trip = await Trips.findOneAndUpdate({_id: tripId, passengers: {$in: [userId]}}, 
+            {ratings: ratings},
+            {new: true, runValidators: true}
+        )
+
+        if (!trip){
+            logger.info(`END: Update Ratings Service`)
+            return errorResponse(res,
+                StatusCodes.BAD_REQUEST,
+                `Could not update trip ratings as Trip is invalid`
+            )
+        }
+
+        logger.info(`END: Update Ratings Service`)
+        successResponse(res,
+            StatusCodes.OK,
+            `Successfully updated ratings`,
+            null
+        )
+
+    }catch(error){
+        logger.error(`Could not update trip rating ${error}`)
+        next(error)
+    }
+}
+
 
 
 export const getAllTrips = async (
@@ -273,45 +323,6 @@ export const getAllTrips = async (
         next(error)
     }
 
-}
-
-
-
-export const updateTripRating = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    try{
-        logger.info(`START: Update Ratings Service`)
-        const userId = req.user.userId
-        const tripId = req.params.tripId
-        const ratings = req.body
-
-        const trip = await Trips.findOneAndUpdate({_id: tripId, passengers: {$in: [userId]}}, 
-            {ratings: ratings},
-            {new: true, runValidators: true}
-        )
-
-        if (!trip){
-            logger.info(`END: Update Ratings Service`)
-            return errorResponse(res,
-                StatusCodes.BAD_REQUEST,
-                `Could not update trip ratings as Trip is invalid`
-            )
-        }
-
-        logger.info(`END: Update Ratings Service`)
-        successResponse(res,
-            StatusCodes.OK,
-            `Successfully updated ratings`,
-            null
-        )
-
-    }catch(error){
-        logger.error(`Could not update trip rating ${error}`)
-        next(error)
-    }
 }
 
 
