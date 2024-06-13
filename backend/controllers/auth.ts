@@ -13,6 +13,7 @@ import { changePasswordEmailService,
     welcomeEmailService, 
     welcomeNotificationService,
     verifyEmailService } from "../services/auth";
+import ApiError from "../middlewares/errorHandler/api-error";
 
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -39,6 +40,15 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
                 `User already exists. Log in instead.`
             )
         }
+
+        const existingPhoneNumber = await User.findOne({phoneNumber})
+
+        if (existingPhoneNumber){
+            logger.info(`END: Create User Service`)
+            
+            return next(ApiError.phoneNumberDuplicateError())
+        }
+
 
         const otp = generateOTP()
 

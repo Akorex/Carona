@@ -21,6 +21,10 @@ class ApiError{
         return new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, `Internal server error.`)
     }
 
+    static phoneNumberDuplicateError(): ApiError{
+        return new ApiError(StatusCodes.CONFLICT, `An account with this phone number already exists.`)
+    }
+
 }
 
 export default ApiError

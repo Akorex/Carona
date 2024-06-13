@@ -9,6 +9,8 @@ import { updateVehicleSeats } from "./vehicles";
 import ApiError from "../middlewares/errorHandler/api-error";
 import { successfulCaronaGoTrip } from "../services/trips";
 import User from "../models/auth";
+import { getBasicVehicleDetails } from "../utils/vehicles";
+import Vehicles from "../models/vehicles";
 
 
 
@@ -86,6 +88,8 @@ export const createTrip = async (
             tripData = response
 
         }
+
+        const vehicle = tripData.vehicleId
     
         const newTrip = await Trips.create({
             ...tripData,
@@ -101,7 +105,7 @@ export const createTrip = async (
             res,
             StatusCodes.OK,
             `Trip created succesfully`,
-            getBasicTripDetails(newTrip)
+            {trip: getBasicTripDetails(newTrip), vehicle: getBasicVehicleDetails(vehicle)}
         )
 
         }
@@ -140,11 +144,22 @@ export const getTrip = async (
             )
         }
 
+        const vehicle = await Vehicles.findOne({_id: trip.vehicleId})
+
+        if (!vehicle){
+            logger.info(`Fetching Vehicle`)
+            return errorResponse(
+                res,
+                StatusCodes.NOT_FOUND,
+                `Could not find vehicle`
+            )
+        }
+
         logger.info(`END: Get Trip Service`)
         successResponse(res,
             StatusCodes.OK,
             `Trip successfully fetched.`,
-            {trip: getBasicTripDetails(trip)}
+            {trip: getBasicTripDetails(trip), vehicle: getBasicVehicleDetails(vehicle)}
         )
 
     }catch(error){
