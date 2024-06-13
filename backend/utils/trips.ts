@@ -40,6 +40,8 @@ export const prepareInfoForCaronaGoTrip = async (
     const distance = route.distance
     const estimatedTravelTime = route.estimatedTravelTime
     const price = calculateFare(distance, estimatedTravelTime)
+    const startLatLong = route.startLatLong
+    const endLatLong = route.endLatLong
     
 
     return {
@@ -48,7 +50,9 @@ export const prepareInfoForCaronaGoTrip = async (
         distance,
         estimatedTravelTime,
         vehicleId,
-        price
+        price,
+        startLatLong,
+        endLatLong
     }
 
 }
@@ -61,6 +65,8 @@ export const prepareInfoForCaronaShareTrip = async (
     const distance = generateDistance()
     const estimatedTravelTime = generateEstimatedTravelTime()
     const price = calculateFare(distance, estimatedTravelTime)
+    const startLatLong = '6.5162173597908, 3.3905528025338283'
+    const endLatLong = '6.559633599898055, 3.3689000521288275'
 
     return {
         start,
@@ -68,7 +74,9 @@ export const prepareInfoForCaronaShareTrip = async (
         distance,
         estimatedTravelTime,
         vehicleId,
-        price
+        price,
+        startLatLong,
+        endLatLong
     }
 
 }

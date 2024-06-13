@@ -14,23 +14,23 @@ import Vehicles from "../models/vehicles";
 
 
 
-export const createTrip = async (
+export const createCaronaGoTrip = async (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
     try{
-        logger.info(`START: Create Trip Service`)
+        logger.info(`START: Create CaronaGo Trip Service`)
         const routeId = req.params.routeId
         const passengerId = req.user.userId
-        const {start, end, vehicleId} = req.body
 
         let tripData: {start: string; 
             end: string; 
             distance: string; 
             estimatedTravelTime: string, 
-            vehicleId: any, price: string} = 
-            {start: '', end: '', distance: '', estimatedTravelTime: '', vehicleId: '', price: ''}
+            vehicleId: any, 
+            price: string
+        } = {start: '', end: '', distance: '', estimatedTravelTime: '', vehicleId: '', price: ''}
 
         if (!passengerId){
             logger.info(`END: Create Trip Service`)
@@ -55,39 +55,18 @@ export const createTrip = async (
         let firstName = user.firstName
         let email = user.email
 
-        if (routeId){
-            logger.info(`START: Trip is in CaronaGo mode`)
-            
-            const response  = await prepareInfoForCaronaGoTrip(routeId)
-            if (response instanceof ApiError){
-                logger.info(`END: Create Trip Service`)
-                return errorResponse(
-                    res,
-                    StatusCodes.BAD_GATEWAY,
-                    response.message
-                )
-            }
+        const response  = await prepareInfoForCaronaGoTrip(routeId)
 
-            tripData = response
-
-        }else{
-
-            logger.info(`START: Trip is in CaronaShare mode`)
-
-            const response = await prepareInfoForCaronaShareTrip(start, end, vehicleId)
-
-            if (response instanceof ApiError){
-                logger.info(`END: Create Trip Service`)
-                return errorResponse(
-                    res,
-                    StatusCodes.BAD_GATEWAY,
-                    response.message
-                )
-            }
-
-            tripData = response
-
+        if (response instanceof ApiError){
+            logger.info(`END: Create Trip Service`)
+            return errorResponse(
+                res,
+                StatusCodes.BAD_GATEWAY,
+                response.message
+            )
         }
+
+        tripData = response
 
         const vehicle = tripData.vehicleId
     
@@ -108,13 +87,92 @@ export const createTrip = async (
             {trip: getBasicTripDetails(newTrip), vehicle: getBasicVehicleDetails(vehicle)}
         )
 
+        }catch(error){
+            logger.error(`Could not create Trip ${error}`)
+            next(error)
         }
 
- catch(error){
+
+}
+
+export const createCaronaShareTrip = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try{
+        logger.info(`START: Create CaronaShare Trip`)
+        const passengerId = req.user.userId
+        const {start, end, vehicleId} = req.body
+
+        let tripData: {start: string; 
+            end: string; 
+            distance: string; 
+            estimatedTravelTime: string, 
+            vehicleId: any, 
+            price: string
+        } = {start: '', end: '', distance: '', estimatedTravelTime: '', vehicleId: '', price: ''}
+
+        if (!passengerId){
+            logger.info(`END: Create Trip Service`)
+            return errorResponse(
+                res,
+                StatusCodes.BAD_REQUEST,
+                `Missing required trip parameters`
+            )
+        }
+
+        const user = await User.findOne({_id: passengerId})
+
+        if (!user){
+            logger.info(`END: Create Trip Service`)
+            return errorResponse(
+                res,
+                StatusCodes.BAD_GATEWAY,
+                `Couldn't fetch user details`
+            )
+        }
+
+        let firstName = user.firstName
+        let email = user.email
+
+        const response = await prepareInfoForCaronaShareTrip(start, end, vehicleId)
+
+        if (response instanceof ApiError){
+            logger.info(`END: Create Trip Service`)
+            return errorResponse(
+                res,
+                StatusCodes.BAD_GATEWAY,
+                response.message
+            )
+        }
+        
+        tripData = response
+
+        const vehicle = tripData.vehicleId
+    
+        const newTrip = await Trips.create({
+            ...tripData,
+            passengers: passengerId
+            })
+        
+        await updateVehicleSeats(tripData.vehicleId)
+        logger.info(`Sending mail about trip`)
+        await successfulCaronaGoTrip(firstName, email)
+
+        logger.info(`END: Create Trip Service`)
+        successResponse(
+            res,
+            StatusCodes.OK,
+            `Trip created succesfully`,
+            {trip: getBasicTripDetails(newTrip), vehicle: getBasicVehicleDetails(vehicle)}
+        )
+    }catch(error){
         logger.error(`Could not create Trip ${error}`)
         next(error)
     }
 }
+
 
 
 
@@ -151,7 +209,7 @@ export const getTrip = async (
             return errorResponse(
                 res,
                 StatusCodes.NOT_FOUND,
-                `Could not find vehicle`
+                `Something went wrong while searching for trip`
             )
         }
 
