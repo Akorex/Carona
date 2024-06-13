@@ -123,8 +123,7 @@ export const getBasicTripDetails = (trip: IBasicTrip) => {
     const arrivalTime = (new Date(arrivalTimeInMilliseconds)).toLocaleTimeString('en-US', {hour: 'numeric', minute: 'numeric', hour12: true})
   
     const data = {
-        trip: {start, end, estimatedTravelTime, price},
-        timingInfo: {departureTime, arrivalTime}
+        start, end, estimatedTravelTime, price, departureTime, arrivalTime
     }
 
     return data

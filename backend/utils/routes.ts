@@ -2,7 +2,9 @@ interface IBasicRoute{
     start: string,
     end: string,
     distance: string,
-    estimatedTravelTime: string
+    estimatedTravelTime: string,
+    startLatLong: string,
+    endLatLong: string
 
 }
 
@@ -11,13 +13,17 @@ export const getBasicRouteDetails = (route: IBasicRoute) => {
         start,
         end, 
         distance,
-        estimatedTravelTime
+        estimatedTravelTime,
+        startLatLong,
+        endLatLong
     } = route
 
     return {
         start,
         end,
         distance,
-        estimatedTravelTime
+        estimatedTravelTime,
+        startLatLong,
+        endLatLong
     }
 }

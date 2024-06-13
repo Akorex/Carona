@@ -12,7 +12,9 @@ export const createRoute = async (req: Request, res: Response, next: NextFunctio
             start,
             end,
             distance,
-            estimatedTravelTime
+            estimatedTravelTime,
+            startLatLong,
+            endLatLong
         } = req.body
 
 
@@ -20,7 +22,9 @@ export const createRoute = async (req: Request, res: Response, next: NextFunctio
             start,
             end,
             distance,
-            estimatedTravelTime
+            estimatedTravelTime,
+            startLatLong,
+            endLatLong
         })
 
         logger.info(`END: Create Route Service`)
@@ -102,7 +106,9 @@ export const getAllRoutes = async (req: Request, res: Response, next: NextFuncti
                 start: route.start,
                 end: route.end,
                 estimatedTravelTime: route.estimatedTravelTime,
-                distance: route.distance
+                distance: route.distance,
+                startLatLong: route.startLatLong,
+                endLatLong: route.endLatLong
             }))
 
 
