@@ -1,4 +1,7 @@
-interface IBasicVehicle {
+import User from "../models/auth"
+
+
+export interface IBasicVehicle {
     type: string,
     model: string,
     colour: any,
@@ -7,7 +10,7 @@ interface IBasicVehicle {
     driverId: any
 }
 
-export const getBasicVehicleDetails = (vehicle: IBasicVehicle) => {
+export const getBasicVehicleDetails = async (vehicle: IBasicVehicle) => {
     const {
         type,
         model,
@@ -17,12 +20,24 @@ export const getBasicVehicleDetails = (vehicle: IBasicVehicle) => {
         driverId
     } = vehicle
 
+
+    const driver = await User.findOne({_id: driverId})
+    let driverName = ''
+
+    if (!driver){
+        driverName = 'Akorede Adewole'
+        
+    }else{
+        driverName = driver.firstName + ' ' + driver.lastName
+    }
+
+
     return {
         type,
         model,
         colour,
         plateNumber,
         availableSeats,
-        driverId
+        driverName
     }
 }

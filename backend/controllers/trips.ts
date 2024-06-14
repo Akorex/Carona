@@ -12,6 +12,7 @@ import Vehicles from "../models/vehicles";
 import Routes from "../models/routes";
 import { calculateFare } from "../utils/trips";
 import { generateDistance, generateEstimatedTravelTime } from "../utils/trips";
+import { IBasicVehicle } from "../utils/vehicles";
 
 
 
@@ -95,7 +96,7 @@ export const createCaronaGoTrip = async (
             StatusCodes.OK,
             `Trip created succesfully`,
             {trip: getBasicTripDetails(newTrip), 
-            vehicle: getBasicVehicleDetails(vehicle[0]), 
+            vehicle: await getBasicVehicleDetails(vehicle[0]), 
             coordinates: {startLatLong, endLatLong}}
         )
 
@@ -177,7 +178,7 @@ export const createCaronaShareTrip = async (
             StatusCodes.OK,
             `Trip created succesfully`,
             {trip: getBasicTripDetails(newTrip), 
-            vehicle: getBasicVehicleDetails(vehicle),
+            vehicle: await getBasicVehicleDetails(vehicle),
             coordinates: {startLatLong, endLatLong}}
         )
     }catch(error){
@@ -229,7 +230,7 @@ export const getTrip = async (
             StatusCodes.OK,
             `Trip successfully fetched.`,
             {trip: getBasicTripDetails(trip), 
-            vehicle: getBasicVehicleDetails(vehicle),
+            vehicle: await getBasicVehicleDetails(vehicle),
             }
         )
 
@@ -303,14 +304,19 @@ export const getAllTrips = async (
 
 
         if (trips && trips.length > 0){
-            const formattedTrips = trips.map((trip) => {
-                const basicVehicle = getBasicVehicleDetails(trip.vehicleId)
+            const formattedTrips = await Promise.all(trips.map(async (trip) => {
+                const vehicle = await Vehicles.findOne({_id: trip.vehicleId})
+
+                if (!vehicle){
+                    return 
+                }
+                const basicVehicle = await getBasicVehicleDetails(vehicle)
 
                 return {
                     ...getBasicTripDetails(trip),
                     vehicle: basicVehicle
                 }
-            })
+            }))
                 
 
         logger.info(`END: Get All Trips Service`)
