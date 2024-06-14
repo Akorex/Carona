@@ -304,33 +304,15 @@ export const getAllTrips = async (
 
         if (trips && trips.length > 0){
             const formattedTrips = trips.map((trip) => {
-                let vehicle = trip.vehicleId // Access vehicle from populated field
-          
-                if (!vehicle) {
-                  logger.info(`END: Get All Trips Service`);
-                  return errorResponse(res, StatusCodes.BAD_GATEWAY, `Error occured while fetching all trips`);
-                }
+                const basicVehicle = getBasicVehicleDetails(trip.vehicleId)
 
-                console.log(vehicle)
-          
                 return {
-                  start:trip.start,
-                  end: trip.end,
-                  estimatedTravelTime: trip.estimatedTravelTime,
-                  price: trip.price,
-                  vehicle: {
-                    type: vehicle.type,
-                    model: vehicle.model,
-                    colour: vehicle.colour,
-                    plateNumber: vehicle.plateNumber,
-                    availableSeats: vehicle.availableSeats,
-                    driverId: vehicle.driverId
-
-                  }
-                  
+                    ...getBasicTripDetails(trip),
+                    vehicle: basicVehicle
                 }
-              })
-        
+            })
+                
+
         logger.info(`END: Get All Trips Service`)
         successResponse(res,
                 StatusCodes.OK,
