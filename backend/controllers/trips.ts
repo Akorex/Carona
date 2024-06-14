@@ -12,9 +12,160 @@ import Vehicles from "../models/vehicles";
 import Routes from "../models/routes";
 import { calculateFare } from "../utils/trips";
 import { generateDistance, generateEstimatedTravelTime } from "../utils/trips";
-import { IBasicVehicle } from "../utils/vehicles";
+
+// GENERAL UTILITY
 
 
+export const getTrip = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try{
+        logger.info(`START: Get Trip Service`)
+
+        const tripId = req.params.tripId
+        const userId = req.user.userId
+
+        const trip = await Trips.findOne({_id: tripId})
+
+        if (!trip){
+            logger.info(`END: Get Trip Service`)
+
+            return errorResponse(
+                res,
+                StatusCodes.NOT_FOUND,
+                `Trip not found`
+            )
+        }
+
+        const vehicle = await Vehicles.findOne({_id: trip.vehicleId})
+
+        if (!vehicle){
+            logger.info(`Fetching Vehicle`)
+            return errorResponse(
+                res,
+                StatusCodes.NOT_FOUND,
+                `Something went wrong while searching for trip`
+            )
+        }
+
+
+        logger.info(`END: Get Trip Service`)
+        successResponse(res,
+            StatusCodes.OK,
+            `Trip successfully fetched.`,
+            {trip: getBasicTripDetails(trip), 
+            vehicle: await getBasicVehicleDetails(vehicle),
+            }
+        )
+
+    }catch(error){
+        logger.error(`Could not get trip ${error}`)
+        next(error)
+    }
+}
+
+
+
+export const getAllTrips = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try{
+        // utility to get all trips by a user whether caronago or caronashare
+        logger.info(`START: Get All Trips Service`)
+        const userId = req.user.userId
+
+        const trips = await Trips.find({passengers: {$in: [userId]}}).populate('vehicleId')
+
+        if (!trips || trips.length === 0){
+            logger.info(`No trips found for the passenger with ID: ${userId}`)
+            logger.info(`END: Get All Trips Service`)
+            return errorResponse(res,
+                StatusCodes.NOT_FOUND,
+                `No trips found for the passenger`
+            )
+
+        }
+
+
+        if (trips && trips.length > 0){
+            const formattedTrips = await Promise.all(trips.map(async (trip) => {
+                const vehicle = await Vehicles.findOne({_id: trip.vehicleId})
+
+                if (!vehicle){
+                    return 
+                }
+                const basicVehicle = await getBasicVehicleDetails(vehicle)
+
+                return {
+                    ...getBasicTripDetails(trip),
+                    vehicle: basicVehicle
+                }
+            }))
+                
+
+        logger.info(`END: Get All Trips Service`)
+        successResponse(res,
+                StatusCodes.OK,
+                `Successfully fetched trips`,
+                {trips: formattedTrips, noOfTrips: formattedTrips.length}
+            )
+
+        }
+
+    }catch(error){
+        logger.error(`Could not get All trips ${error}`)
+        next(error)
+    }
+
+}
+
+
+
+export const updateTripRating = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try{
+        logger.info(`START: Update Ratings Service`)
+        const userId = req.user.userId
+        const tripId = req.params.tripId
+        const ratings = req.body
+
+        const trip = await Trips.findOneAndUpdate({_id: tripId, passengers: {$in: [userId]}}, 
+            {ratings: ratings},
+            {new: true, runValidators: true}
+        )
+
+        if (!trip){
+            logger.info(`END: Update Ratings Service`)
+            return errorResponse(res,
+                StatusCodes.BAD_REQUEST,
+                `Could not update trip ratings as Trip is invalid`
+            )
+        }
+
+        logger.info(`END: Update Ratings Service`)
+        successResponse(res,
+            StatusCodes.OK,
+            `Successfully updated ratings`,
+            null
+        )
+
+    }catch(error){
+        logger.error(`Could not update trip rating ${error}`)
+        next(error)
+    }
+}
+
+
+
+
+// CARONA GO UTILITY 
 
 export const createCaronaGoTrip = async (
     req: Request,
@@ -108,6 +259,12 @@ export const createCaronaGoTrip = async (
 
 }
 
+
+
+
+
+// CARONA SHARE UTILITY
+
 export const createCaronaShareTrip = async (
     req: Request,
     res: Response,
@@ -188,163 +345,13 @@ export const createCaronaShareTrip = async (
 }
 
 
-
-
-export const getTrip = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    try{
-        logger.info(`START: Get Trip Service`)
-
-        const tripId = req.params.tripId
-        const userId = req.user.userId
-
-        const trip = await Trips.findOne({_id: tripId})
-
-        if (!trip){
-            logger.info(`END: Get Trip Service`)
-
-            return errorResponse(
-                res,
-                StatusCodes.NOT_FOUND,
-                `Trip not found`
-            )
-        }
-
-        const vehicle = await Vehicles.findOne({_id: trip.vehicleId})
-
-        if (!vehicle){
-            logger.info(`Fetching Vehicle`)
-            return errorResponse(
-                res,
-                StatusCodes.NOT_FOUND,
-                `Something went wrong while searching for trip`
-            )
-        }
-
-
-        logger.info(`END: Get Trip Service`)
-        successResponse(res,
-            StatusCodes.OK,
-            `Trip successfully fetched.`,
-            {trip: getBasicTripDetails(trip), 
-            vehicle: await getBasicVehicleDetails(vehicle),
-            }
-        )
-
-    }catch(error){
-        logger.error(`Could not get trip ${error}`)
-        next(error)
-    }
-}
-
-
-export const updateTripRating = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    try{
-        logger.info(`START: Update Ratings Service`)
-        const userId = req.user.userId
-        const tripId = req.params.tripId
-        const ratings = req.body
-
-        const trip = await Trips.findOneAndUpdate({_id: tripId, passengers: {$in: [userId]}}, 
-            {ratings: ratings},
-            {new: true, runValidators: true}
-        )
-
-        if (!trip){
-            logger.info(`END: Update Ratings Service`)
-            return errorResponse(res,
-                StatusCodes.BAD_REQUEST,
-                `Could not update trip ratings as Trip is invalid`
-            )
-        }
-
-        logger.info(`END: Update Ratings Service`)
-        successResponse(res,
-            StatusCodes.OK,
-            `Successfully updated ratings`,
-            null
-        )
-
-    }catch(error){
-        logger.error(`Could not update trip rating ${error}`)
-        next(error)
-    }
-}
-
-
-
-export const getAllTrips = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    try{
-        // utility to get all trips by a user whether caronago or caronashare
-        logger.info(`START: Get All Trips Service`)
-        const userId = req.user.userId
-
-        const trips = await Trips.find({passengers: {$in: [userId]}}).populate('vehicleId')
-
-        if (!trips || trips.length === 0){
-            logger.info(`No trips found for the passenger with ID: ${userId}`)
-            logger.info(`END: Get All Trips Service`)
-            return errorResponse(res,
-                StatusCodes.NOT_FOUND,
-                `No trips found for the passenger`
-            )
-
-        }
-
-
-        if (trips && trips.length > 0){
-            const formattedTrips = await Promise.all(trips.map(async (trip) => {
-                const vehicle = await Vehicles.findOne({_id: trip.vehicleId})
-
-                if (!vehicle){
-                    return 
-                }
-                const basicVehicle = await getBasicVehicleDetails(vehicle)
-
-                return {
-                    ...getBasicTripDetails(trip),
-                    vehicle: basicVehicle
-                }
-            }))
-                
-
-        logger.info(`END: Get All Trips Service`)
-        successResponse(res,
-                StatusCodes.OK,
-                `Successfully fetched trips`,
-                {trips: formattedTrips, noOfTrips: formattedTrips.length}
-            )
-
-        }
-
-    }catch(error){
-        logger.error(`Could not get All trips ${error}`)
-        next(error)
-    }
-
-}
-
-
-
-// restricted to CaronaShare Only => future work needed
-// todo: reduce availableSeats by amount of users added to Trip
 export const addPassengerToTrip = async (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
     try{
+        // incomplete work done here
         logger.info(`START: Add Passenger Service`)
         const passengers = req.body
         const tripId = req.params.tripId
