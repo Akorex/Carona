@@ -25,7 +25,7 @@ export const getBasicVehicleDetails = async (vehicle: IBasicVehicle) => {
     let driverName = ''
 
     if (!driver){
-        driverName = 'Akorede Adewole'
+        driverName = 'Seun Taiwo' // placeholder for CaronaShare driver
         
     }else{
         driverName = driver.firstName + ' ' + driver.lastName

@@ -12,9 +12,10 @@ import Vehicles from "../models/vehicles";
 import Routes from "../models/routes";
 import { calculateFare } from "../utils/trips";
 import { generateDistance, generateEstimatedTravelTime } from "../utils/trips";
+import { getBasicRouteCoordinates } from "../utils/routes";
+
 
 // GENERAL UTILITY
-
 
 export const getTrip = async (
     req: Request,
@@ -27,7 +28,7 @@ export const getTrip = async (
         const tripId = req.params.tripId
         const userId = req.user.userId
 
-        const trip = await Trips.findOne({_id: tripId})
+        const trip = await Trips.findOne({_id: tripId, passengers: {$in: [userId]}})
 
         if (!trip){
             logger.info(`END: Get Trip Service`)
@@ -57,6 +58,7 @@ export const getTrip = async (
             `Trip successfully fetched.`,
             {trip: getBasicTripDetails(trip), 
             vehicle: await getBasicVehicleDetails(vehicle),
+            coordinates: await getBasicRouteCoordinates(trip.routeId)
             }
         )
 
@@ -90,10 +92,10 @@ export const getAllTrips = async (
 
         }
 
-
         if (trips && trips.length > 0){
             const formattedTrips = await Promise.all(trips.map(async (trip) => {
                 const vehicle = await Vehicles.findOne({_id: trip.vehicleId})
+                const routeId = trip.routeId
 
                 if (!vehicle){
                     return 
@@ -102,7 +104,9 @@ export const getAllTrips = async (
 
                 return {
                     ...getBasicTripDetails(trip),
-                    vehicle: basicVehicle
+                    vehicle: basicVehicle,
+                    coordinates: await getBasicRouteCoordinates(routeId)
+
                 }
             }))
                 
@@ -231,6 +235,7 @@ export const createCaronaGoTrip = async (
             estimatedTravelTime,
             price,
             vehicleId,
+            routeId,
             passengers: passengerId
             })
         
@@ -308,8 +313,9 @@ export const createCaronaShareTrip = async (
         const distance = generateDistance()
         const estimatedTravelTime = generateEstimatedTravelTime()
         const price = calculateFare(distance, estimatedTravelTime)
-        const startLatLong = '6.5162173597908, 3.3905528025338283'
+        const startLatLong = '6.5162173597908, 3.3905528025338283' // placeholder for Caronashare coordinates
         const endLatLong = '6.559633599898055, 3.3689000521288275'
+        const routeId = '1234' // replace 
 
     
         const newTrip = await Trips.create({

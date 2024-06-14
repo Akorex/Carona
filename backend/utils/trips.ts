@@ -9,33 +9,6 @@ interface IBasicTrip{
 }
 
 
-
-
-export const prepareInfoForCaronaShareTrip = async (
-    start: string,
-    end: string,
-    vehicleId: any
-) => {
-    const distance = generateDistance()
-    const estimatedTravelTime = generateEstimatedTravelTime()
-    const price = calculateFare(distance, estimatedTravelTime)
-    const startLatLong = '6.5162173597908, 3.3905528025338283'
-    const endLatLong = '6.559633599898055, 3.3689000521288275'
-
-    return {
-        start,
-        end, 
-        distance,
-        estimatedTravelTime,
-        vehicleId,
-        price,
-        startLatLong,
-        endLatLong
-    }
-
-}
-
-
 export const calculateFare = (distance: string, time: string) => {
     const baseFee = BASE_FARE
 
@@ -72,7 +45,7 @@ export const getBasicTripDetails = (trip: IBasicTrip) => {
         price
     } = trip
 
-    const departureTime = "09:00 AM"
+    const departureTime = "09:00 AM" // placeholder startTime
     const departureHour = parseInt(departureTime.split(":")[0])
     const departureMinute = parseInt(departureTime.split(":")[1])
     const departureDate = new Date();

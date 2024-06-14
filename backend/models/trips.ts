@@ -21,6 +21,11 @@ const tripSchema = new mongoose.Schema({
         ref: "User"
     }],
 
+    routeId: {
+        type: Schema.Types.ObjectId,
+        ref: "Routes"
+    },
+
     distance: {
         type: String, // all distances are measured in kilometers
         required: true
