@@ -2,6 +2,7 @@ import User from "../models/auth"
 
 
 export interface IBasicVehicle {
+    _id: any
     type: string,
     model: string,
     colour: any,
@@ -12,6 +13,7 @@ export interface IBasicVehicle {
 
 export const getBasicVehicleDetails = async (vehicle: IBasicVehicle) => {
     const {
+        _id,
         type,
         model,
         colour,
@@ -33,6 +35,7 @@ export const getBasicVehicleDetails = async (vehicle: IBasicVehicle) => {
 
 
     return {
+        _id,
         type,
         model,
         colour,

@@ -103,6 +103,7 @@ export const getAllRoutes = async (req: Request, res: Response, next: NextFuncti
 
         if (routes && routes.length > 0){
             const formattedRoutes = routes.map((route) => ({
+                _id: route._id,
                 start: route.start,
                 end: route.end,
                 estimatedTravelTime: route.estimatedTravelTime,

@@ -1,6 +1,7 @@
 import Routes from "../models/routes"
 
 interface IBasicRoute{
+    _id: any
     start: string,
     end: string,
     distance: string,
@@ -12,6 +13,7 @@ interface IBasicRoute{
 
 export const getBasicRouteDetails = (route: IBasicRoute) => {
     const {
+        _id,
         start,
         end, 
         distance,
@@ -21,6 +23,7 @@ export const getBasicRouteDetails = (route: IBasicRoute) => {
     } = route
 
     return {
+        _id,
         start,
         end,
         distance,

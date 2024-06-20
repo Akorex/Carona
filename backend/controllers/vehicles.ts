@@ -130,6 +130,7 @@ export const getAllVehicles = async (
 
         if (vehicles && vehicles.length > 0){
                 const formattedVehicles = vehicles.map((vehicle) => ({
+                    _id: vehicle._id,
                     type: vehicle.type,
                     model: vehicle.model,
                     colour: vehicle.colour,

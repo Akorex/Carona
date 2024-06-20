@@ -2,6 +2,7 @@ import { BASE_FARE, TIME_RATE, DISTANCE_RATE} from "../config/config"
 
 
 interface IBasicTrip{
+    _id: any
     start: string,
     end: string,
     estimatedTravelTime: string,
@@ -39,6 +40,7 @@ export const generateEstimatedTravelTime = () => {
 
 export const getBasicTripDetails = (trip: IBasicTrip) => {
     const {
+        _id,
         start,
         end,
         estimatedTravelTime,
@@ -58,7 +60,7 @@ export const getBasicTripDetails = (trip: IBasicTrip) => {
     const arrivalTime = (new Date(arrivalTimeInMilliseconds)).toLocaleTimeString('en-US', {hour: 'numeric', minute: 'numeric', hour12: true})
   
     const data = {
-        start, end, estimatedTravelTime, price, departureTime, arrivalTime
+        _id, start, end, estimatedTravelTime, price, departureTime, arrivalTime
     }
 
     return data
