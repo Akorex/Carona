@@ -40,7 +40,7 @@ export const createVehicle = async (
         successResponse(res,
             StatusCodes.OK,
             `Created a new vehicle successfully`,
-            {vehicle: getBasicVehicleDetails(newVehicle)}
+            {vehicle: await getBasicVehicleDetails(newVehicle)}
         )
 
     }catch(error){
@@ -108,7 +108,7 @@ export const getVehicle = async (
         successResponse(res,
             StatusCodes.OK,
             `Successfully fetched vehicle`,
-            {vehicle: getBasicVehicleDetails(vehicle), driverDetails: driver?.firstName + ' ' + driver?.lastName}
+            {vehicle: await getBasicVehicleDetails(vehicle), driverDetails: driver?.firstName + ' ' + driver?.lastName}
         )
 
     }catch(error){
@@ -188,7 +188,7 @@ export const updateVehicleDetails = async (
             successResponse(res,
                 StatusCodes.OK,
                 `Successfully updated details`,
-                {vehicle: getBasicVehicleDetails(vehicle)}
+                {vehicle: await getBasicVehicleDetails(vehicle)}
             )
         }else{
             logger.info(`END: Update Vehicle Service`)

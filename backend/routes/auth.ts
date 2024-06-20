@@ -23,7 +23,7 @@ import { googleSignUp, googleSignUpCallback } from "../controllers/google";
 
 const authRouter = Router()
 authRouter.post('/register', joiMiddleware(registerUserValidator), registerUser)
-authRouter.get('/getUser/:id', isLoggedIn, getUserDetails)
+authRouter.get('/getUser', isLoggedIn, getUserDetails)
 authRouter.post('/verifyUser', verifyUser)
 authRouter.get('/verifyUser', loadVerifyUser)
 authRouter.post('/login', joiMiddleware(loginUserValidator), loginUser)
