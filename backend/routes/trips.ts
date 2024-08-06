@@ -5,7 +5,7 @@ import {
     getTrip,
     getAllTrips
  } from "../controllers/trips";
-import { createACaronaShareTrip } from "../controllers/caronashare";
+import { addPassengerToCaronaShareTrip, createACaronaShareTrip, getAllAvailableCaronaShareTrips, sendRequestToJoinACaronaShareTrip } from "../controllers/caronashare";
 
 
 const tripsRouter = Router()
@@ -17,6 +17,9 @@ tripsRouter.get('/', isLoggedIn, getAllTrips)
 
 // CARONA SHARE
 tripsRouter.post('/caronashare/create', isLoggedIn, createACaronaShareTrip)
+tripsRouter.post('/caronashare/share/:tripId', isLoggedIn, sendRequestToJoinACaronaShareTrip)
+tripsRouter.post('/caronashare/share/:tripId/:passengerId', isLoggedIn, addPassengerToCaronaShareTrip)
+tripsRouter.get('/caronashare/trips', isLoggedIn, getAllAvailableCaronaShareTrips)
 
 
 export default tripsRouter

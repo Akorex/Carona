@@ -46,7 +46,7 @@ const tripSchema = new mongoose.Schema({
         default: 5
     },
 
-    type: {
+    tripType: {
         type: String,
         enum: ['caronago', 'caronashare'],
         default: 'caronago'

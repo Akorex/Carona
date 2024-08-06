@@ -198,7 +198,7 @@ export const createACaronaShareTrip = async (
             price,
             vehicleId: vehicle._id,
             passengers: passengerId,
-            type: 'caronashare'
+            tripType: 'caronashare'
             })
         
         //await updateVehicleSeats(vehicle._id)
@@ -253,7 +253,7 @@ export const sendRequestToJoinACaronaShareTrip = async (req: Request, res: Respo
 
         const tripCreatorId = trip.passengers[0]
 
-        await sendRequestNotification(tripId, tripCreatorId, userId) // todo: replace second tripId
+        await sendRequestNotification(tripId, tripCreatorId, userId)
 
         logger.info(`END: Send Request for Trip Service`)
         successResponse(
@@ -274,12 +274,12 @@ export const sendRequestToJoinACaronaShareTrip = async (req: Request, res: Respo
 export const addPassengerToCaronaShareTrip = async (req: Request, res: Response, next: NextFunction) => {
     try{
         logger.info(`START: Add Passenger to Trip Service`)
-        const userId = req.user.userId
-        const tripId = req.params.tripId // assumed to be there
-        const passenger = req.body // to think of this tripjoinerid
+        const creatorId = req.user.userId
+        const tripId = req.params.tripId
+        const joinerId = req.params.passengerId // to think of this tripjoinerid
 
-        const trip = await Trips.findOneAndUpdate({_id: tripId, passengers: {$in: [userId]}}, 
-            {passengers: [userId, passenger]},
+        const trip = await Trips.findOneAndUpdate({_id: tripId, passengers: {$in: [creatorId]}}, 
+            {passengers: [creatorId, joinerId]},
             {runValidators: true, new: true}
 
         )
@@ -309,24 +309,33 @@ export const addPassengerToCaronaShareTrip = async (req: Request, res: Response,
 }
 
 
-
-
-
 export const getAllAvailableCaronaShareTrips = async (req: Request, res: Response, next: NextFunction) => {
     try{
         logger.info(`START: Get All Trips Service`)
 
-        const trips = await Trips.find({type: 'caronashare'})
-
+        const trips = await Trips.find({tripType: 'caronashare'})
 
         logger.info(`END: Get All Trips Service`)
+
+        if (!trips || trips.length === 0){
+            logger.info(`END: Get All Trips Service`)
+            return errorResponse(
+                res,
+                StatusCodes.NOT_FOUND,
+                `Could not find carona share trips`
+            )
+        }
+
+        const formattedTrips = trips.map((trip) => {
+                return getBasicTripDetails(trip);
+              });
+
         successResponse(
             res,
             StatusCodes.OK,
             `Successfully fetched trips`,
-            trips //to format properly
+            formattedTrips
         )
-
     }catch(error){
         logger.error(`Could not get trips ${error}`)
         next(error)

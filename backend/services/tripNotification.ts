@@ -11,9 +11,15 @@ export const sendRequestNotification = async (tripId: any, tripCreator: any, tri
     const tripJoinerName = (await User.findOne({_id: tripJoiner}))?.firstName
 
 
-    const title = `Request to join Trip - ${start} - ${end}`
+    const title = `Request to join Trip: ${start} - ${end}`
     const message = `Hello, ${tripCreatorName},
                         
-                    An approved CaronaShare User, ${tripJoinerName} wants to join your trip.
+                    An approved CaronaShare User, ${tripJoinerName},  wants to join your trip.
                     Please approve or reject this request.`
+
+    await Notifications.create({
+        title,
+        message,
+        userId: tripCreator // they receive the mail
+    })
 }
