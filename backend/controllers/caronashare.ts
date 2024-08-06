@@ -2,7 +2,7 @@ import {Request, Response, NextFunction} from 'express'
 import logger from '../utils/logger'
 import User from '../models/auth'
 import { errorResponse, successResponse } from '../utils/responses'
-import { OK, StatusCodes } from 'http-status-codes'
+import { StatusCodes } from 'http-status-codes'
 import Vehicles from '../models/vehicles'
 import { generateDistance } from '../utils/trips'
 import { calculateFare } from '../utils/trips'
@@ -84,7 +84,7 @@ export const approveCaronaShareUser = async (req:Request, res: Response, next: N
             )
         }
 
-        // send email to user that they can now share their rides with other approved users
+        // send email to user that they are now approved for Carona Share
 
         successResponse(
             res,
@@ -229,6 +229,7 @@ export const sendRequestToJoinACaronaShareTrip = async (req: Request, res: Respo
         logger.info(`START: Send Request for Trip Service`)
         const userId = req.user.userId
         const tripId = req.params.tripId
+        
 
         if (!userId && !tripId){
             logger.info(`END: Send Request for Trip Service`)
@@ -239,7 +240,20 @@ export const sendRequestToJoinACaronaShareTrip = async (req: Request, res: Respo
             )
         }
 
-        await sendRequestNotification(tripId, tripId, userId) // todo: replace second tripId
+        const trip = await Trips.findOne({_id: tripId})
+
+        if (!trip){
+            logger.info(`END: Send Request for Trip Service`)
+            return errorResponse(
+                res,
+                StatusCodes.NOT_FOUND,
+                `Could not find associated trip`
+            )
+        }
+
+        const tripCreatorId = trip.passengers[0]
+
+        await sendRequestNotification(tripId, tripCreatorId, userId) // todo: replace second tripId
 
         logger.info(`END: Send Request for Trip Service`)
         successResponse(
@@ -256,6 +270,47 @@ export const sendRequestToJoinACaronaShareTrip = async (req: Request, res: Respo
     }
 
 }
+
+export const addPassengerToCaronaShareTrip = async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        logger.info(`START: Add Passenger to Trip Service`)
+        const userId = req.user.userId
+        const tripId = req.params.tripId // assumed to be there
+        const passenger = req.body // to think of this tripjoinerid
+
+        const trip = await Trips.findOneAndUpdate({_id: tripId, passengers: {$in: [userId]}}, 
+            {passengers: [userId, passenger]},
+            {runValidators: true, new: true}
+
+        )
+
+        if (!trip){
+            logger.info(`END: Add Passenger Service`)
+            return errorResponse(
+                res,
+                StatusCodes.BAD_REQUEST,
+                `Could not update Trip as Trip is invalid`
+            )
+        }
+
+        logger.info(`END: Add Passenger Service`)
+        successResponse(res,
+            StatusCodes.OK,
+            `Successfully added passengers to Trip`,
+            {trip: getBasicTripDetails(trip)}
+        )
+
+
+
+    }catch(error){
+        logger.error(`Could not add passenger to trip ${error}`)
+        next(error)
+    }
+}
+
+
+
+
 
 export const getAllAvailableCaronaShareTrips = async (req: Request, res: Response, next: NextFunction) => {
     try{

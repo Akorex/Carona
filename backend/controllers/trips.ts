@@ -11,7 +11,6 @@ import { getBasicVehicleDetails } from "../utils/vehicles";
 import Vehicles from "../models/vehicles";
 import Routes from "../models/routes";
 import { calculateFare } from "../utils/trips";
-import { generateDistance, generateEstimatedTravelTime } from "../utils/trips";
 import { getBasicRouteCoordinates } from "../utils/routes";
 
 
@@ -264,52 +263,3 @@ export const createCaronaGoTrip = async (
 
 }
 
-
-
-
-
-// CARONA SHARE UTILITY
-
-
-export const addPassengerToTrip = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    try{
-        // incomplete work done here
-        logger.info(`START: Add Passenger Service`)
-        const passengers = req.body
-        const tripId = req.params.tripId
-        const userId = req.user.userId
-
-        const trip = await Trips.findOneAndUpdate({_id: tripId, passengers: {$in: [userId]}}, 
-            {passengers: [userId, passengers]},
-            {runValidators: true, new: true}
-
-        )
-
-        if (!trip){
-            logger.info(`END: Add Passenger Service`)
-
-            return errorResponse(
-                res,
-                StatusCodes.BAD_REQUEST,
-                `Could not update Trip as Trip is invalid`
-            )
-        }
-
-
-        logger.info(`END: Add Passenger Service`)
-        successResponse(res,
-            StatusCodes.OK,
-            `Successfully added passengers to Trip`,
-            {trip: getBasicTripDetails(trip)}
-        )
-
-
-    }catch(error){
-        logger.error(`Could not update trip ${error}`)
-        next(error)
-    }
-}
