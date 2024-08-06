@@ -18,7 +18,9 @@ import {
 } from '../validators/auth'
 import joiMiddleware from "../middlewares/joiMiddleware";
 import {isLoggedIn} from '../middlewares/authentication'
+import { isAdmin } from "../middlewares/authentication";
 import { googleSignUp, googleSignUpCallback } from "../controllers/google";
+import { approveCaronaShareUser, registerCaronaShareUser, registerCaronaUserWithoutCar } from "../controllers/caronashare";
 
 
 const authRouter = Router()
@@ -34,5 +36,10 @@ authRouter.patch('/change-password', isLoggedIn, changePassword)
 authRouter.post('/delete-account', isLoggedIn, deleteAccount)
 authRouter.get('/google/signin', googleSignUp)
 authRouter.get('/google/callback', googleSignUpCallback)
+
+// CARONA SHARE
+authRouter.post('/caronashare/registerToShare', isLoggedIn, registerCaronaShareUser)
+authRouter.post('/caronashare/registerToRide', isLoggedIn, registerCaronaUserWithoutCar)
+authRouter.post('/caronashare/:userId/approve', isAdmin, approveCaronaShareUser)
 
 export default authRouter
