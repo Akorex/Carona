@@ -44,6 +44,12 @@ const tripSchema = new mongoose.Schema({
         type: Number,
         enum: [1, 2, 3, 4, 5],
         default: 5
+    },
+
+    type: {
+        type: String,
+        enum: ['caronago', 'caronashare'],
+        default: 'caronago'
     }
 
 }, {timestamps: true})
