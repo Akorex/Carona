@@ -27,6 +27,7 @@ export interface IBasicUser extends Timestamps {
     firstName: string,
     lastName: string,
     email: string,
+    role: string
 }
 
 interface IJWToken {
@@ -86,7 +87,8 @@ export const getBasicUserDetails = (user: IBasicUser) => {
         lastName,
         email,
         createdAt,
-        updatedAt
+        updatedAt,
+        role
     } = user
 
     return {
@@ -95,7 +97,8 @@ export const getBasicUserDetails = (user: IBasicUser) => {
         lastName,
         email,
         createdAt,
-        updatedAt
+        updatedAt,
+        role
     }
 
 }
